@@ -15,6 +15,9 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 	Body[] data;
 
 	[SerializeField] KinectSkeleton skeleton;
+    float[] skeletonDimensions;
+
+    ulong trackingId = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -29,6 +32,14 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 
 		AddDisposable(reader);
 		AddDisposable(sensor.Close);
+
+        skeletonDimensions = new float[25];
+
+        for(int i=1; i<25; ++i)
+        {
+            var parent = KinectSkeleton.GetParent((JointType)i).Value();
+            skeletonDimensions[i] = (skeleton[i].transform.position - skeleton[parent].transform.position).magnitude;
+        }
 	}
 	
 	void FixedUpdate () {
@@ -38,11 +49,29 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 	}
 
 	void Update () {
-		var body = data[0];
+        Body body = null;
+        
+        foreach(var b in data)
+        {
+            if(trackingId == 0 && b != null && b.IsTracked == true && b.TrackingId > 0)
+            {
+                trackingId = b.TrackingId;
+                body = b;
+                break;
+            }
+            if(trackingId != 0 && b != null && b.TrackingId == trackingId)
+            {
+                body = b;
+                break;
+            }
+        }
+
+        
 		if (body==null) return;
+        Debug.Log(body?.Joints[JointType.HandRight].Position.Y);
 		foreach(JointType joint in System.Enum.GetValues(typeof(JointType))){
 			if(joint == JointType.SpineBase) continue;
-			skeleton[joint].localPosition = skeleton[joint].localPosition.magnitude * GetDirection(body, joint); 
+			skeleton[joint].localPosition =  GetDirection(body, joint); 
 
 		}
 	}
