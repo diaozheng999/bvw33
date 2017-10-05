@@ -32,6 +32,9 @@ public struct KinectSkeleton : ICollection<Transform> {
     public Transform HandTipRight;
     public Transform ThumbRight;
 
+    public float[] defaultSize;
+    public Quaternion[] defaultRotation;
+
     public IEnumerator<Transform> GetEnumerator(){
         yield return SpineBase;
         yield return SpineMid;
@@ -95,7 +98,7 @@ public struct KinectSkeleton : ICollection<Transform> {
 
     public bool Contains(Transform t){
         if(t==null) return false;
-        for(int i=0; i<24; ++i){
+        for(int i=0; i<25; ++i){
             if(this[i]!=null && t.GetInstanceID() == this[i].GetInstanceID()){
                 return true;
             }
@@ -104,10 +107,32 @@ public struct KinectSkeleton : ICollection<Transform> {
     }
 
     public void Clear(){
-        for(int i=0; i<24; ++i){
+        for(int i=0; i<25; ++i){
             this[i] = null;
         }
     }
+
+    public void FillDefaultValues() {
+        defaultSize = new float[25];
+        defaultRotation = new Quaternion[25];
+
+        for(int i=0; i<25; ++i){
+            var child = PointsAt((JointType)i);
+            var parent = GetParent((JointType)i);
+
+
+            if (child.IsSome()) {
+                defaultRotation[i] = Quaternion.FromToRotation(this[i].forward, this[child.Value()].position);
+                Debug.Log((JointType)i+": "+defaultRotation[i].eulerAngles);
+            }
+
+            if (parent.IsSome()) {
+                defaultSize[i] = (this[i].position - this[parent.Value()].position).magnitude;
+            }
+
+        }
+    }
+
 
     public void Add(Transform t){
         throw new System.NotImplementedException("Skeletons don't support add/remove.");
@@ -120,6 +145,32 @@ public struct KinectSkeleton : ICollection<Transform> {
     public void CopyTo(Transform[] array, int id){
         for(int i=0; i<Count; ++i){
             array[id+i] = this[i];
+        }
+    }
+
+
+    public static Option<JointType> PointsAt(JointType joint){
+        switch(joint){
+            case JointType.SpineBase: return Option.Some(JointType.SpineMid);
+            case JointType.SpineMid: return Option.None<JointType>();
+            case JointType.Neck: return Option.Some(JointType.Head);
+            case JointType.Head: return Option.None<JointType>();
+            case JointType.ShoulderLeft: return Option.Some(JointType.ElbowLeft);
+            case JointType.ElbowLeft: return Option.Some(JointType.WristLeft);
+            case JointType.WristLeft: return Option.Some(JointType.HandLeft);
+            case JointType.HandLeft: return Option.Some(JointType.HandTipLeft);
+            case JointType.ShoulderRight: return Option.Some(JointType.ElbowRight);
+            case JointType.ElbowRight: return Option.Some(JointType.WristRight);
+            case JointType.WristRight: return Option.Some(JointType.HandRight);
+            case JointType.HandRight: return Option.Some(JointType.HandTipRight);
+            case JointType.HipLeft: return Option.Some(JointType.KneeLeft);
+            case JointType.KneeLeft: return Option.Some(JointType.AnkleLeft);
+            case JointType.AnkleLeft: return Option.Some(JointType.FootLeft);
+            case JointType.FootLeft: return Option.None<JointType>();
+            case JointType.HipRight: return Option.Some(JointType.KneeRight);
+            case JointType.KneeRight: return Option.Some(JointType.FootRight);
+            case JointType.FootRight: return Option.None<JointType>();
+            default: return Option.None<JointType>();
         }
     }
 
@@ -158,11 +209,6 @@ public struct KinectSkeleton : ICollection<Transform> {
     public Transform this[int jointId]{
         get { return this[(JointType)jointId]; }
         set { this[(JointType)jointId] = value; }
-    }
-
-    public void Look()
-    {
-
     }
 
     public Transform this[JointType jointId] {
