@@ -138,7 +138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c2128f26cbf5f47b96216b249e8629, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poseId: 0
+  poseId: 2
   poseRenderer: {fileID: 282893848}
 --- !u!23 &282893848
 MeshRenderer:
@@ -391,6 +391,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 114709584480085900, guid: eb03bc5910dd2534cbc6689320b531c3,
+        type: 2}
+      propertyPath: filename
+      value: log_dab_3.csv
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: eb03bc5910dd2534cbc6689320b531c3, type: 2}
   m_IsPrefabParent: 0
@@ -401,6 +406,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114854617085901128, guid: 6456685fbc766814096c27c6f2dae052,
+        type: 2}
+      propertyPath: poses.Array.size
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4048629878419478, guid: 6456685fbc766814096c27c6f2dae052, type: 2}
       propertyPath: m_LocalPosition.x
       value: -0.026229858
@@ -432,6 +442,11 @@ Prefab:
     - target: {fileID: 4048629878419478, guid: 6456685fbc766814096c27c6f2dae052, type: 2}
       propertyPath: m_RootOrder
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114854617085901128, guid: 6456685fbc766814096c27c6f2dae052,
+        type: 2}
+      propertyPath: poses.Array.data[2]
+      value: pose3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6456685fbc766814096c27c6f2dae052, type: 2}
@@ -503,7 +518,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400130, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400130, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}
       propertyPath: m_LocalRotation.z
@@ -511,7 +526,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400130, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 400130, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}
       propertyPath: m_RootOrder
@@ -519,7 +534,19 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400130, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400130, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400130, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 400130, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c3847e1ab885016459736597ca2d1a4a, type: 3}

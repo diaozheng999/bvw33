@@ -6,7 +6,9 @@ public class PoseDemo : MonoBehaviour {
     [SerializeField] Renderer poseRenderer;
 
     void Update() {
-        poseRenderer.enabled = PoseEstimator.instance.Estimate(poseId) > 0.4f;
+        var p = PoseEstimator.instance.Estimate(poseId);
+        Debug.Log(p);
+        poseRenderer.enabled = p > 0.4f;
     }
 
 }
