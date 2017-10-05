@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameMaster : MonoBehaviour {
 
@@ -20,13 +21,16 @@ public class GameMaster : MonoBehaviour {
     private float startJudgeWaitTime = secondPerBeat * 4f;
     private float stopJudgeWaitTime = secondPerBeat * 7f;
     private float waitTime = secondPerBeat * 4f;
-    private float generateWaitTime = secondPerBeat * 8f; 
+    private float generateWaitTime = secondPerBeat * 8f;
+
+    private float perfectPeriod = 0.1f;
+    private float gracePeriod = 0.3f;
 
     private float moveSpeed = stageOffSet / (secondPerBeat * 3f);
 
     private int currentBlock = 0;
     private int numOfGeneratedBlock = 0;
-    private int numOfBlockStage = 3;
+    private int numOfBlockStage = 10;
     private int numOfPoseOnRoundStage = 5;
 
     [SerializeField]
@@ -36,10 +40,20 @@ public class GameMaster : MonoBehaviour {
     [SerializeField]
     private GameObject camera;
 
+    private float threshold = 0.4f;
+
+    private bool isEarly = false;
+    private bool isPerfect = false;
+    private bool isLate = false;
+    private bool isPassCheckPoint = true;
+
+    [SerializeField]
+    private Text feedbackText;
+
     void Start () {
         startTime = Time.time;
         nextGenerateTime = startTime + generateWaitTime;
-        SetTheScene(2);
+        SetTheScene(7);
         SetThePlayer();
 	}
 
@@ -89,7 +103,30 @@ public class GameMaster : MonoBehaviour {
                 nextGenerateTime = float.MaxValue;
             }
         }
+        // update judge time
+        if (currentTime > (stopJudgeTime + gracePeriod))
+        {
+            if (currentBlock < (numOfBlockStage - 1))
+            {
+                // update judge time (judge every 8 beats)
+                startJudgeTime += (waitTime * 2f);
+                stopJudgeTime += (waitTime * 2f);
+            }
+            else if (currentBlock == (numOfBlockStage - 1))
+            {
+                // update judge time (judge in 12 beats)
+                startJudgeTime += (waitTime * 3f);
+                stopJudgeTime += (waitTime * 3f);
+            }
+            else if (currentBlock < (numOfBlockStage + numOfPoseOnRoundStage - 1))
+            {
+                // update judge time (judge every 4 beats)
+                startJudgeTime += waitTime;
+                stopJudgeTime += waitTime;
+            }
+        }
 
+        // update player position
         if (currentTime >= (stopJudgeTime + secondPerBeat))
         {
             if (currentBlock < (numOfBlockStage - 1))
@@ -97,35 +134,71 @@ public class GameMaster : MonoBehaviour {
                 // update player position
                 nextPlayerPosition.z += stageOffSet;
                 currentBlock++;
-                // update judge time (judge every 8 beats)
-                startJudgeTime += (waitTime * 2f);
-                stopJudgeTime += (waitTime * 2f);
             }
             else if (currentBlock == (numOfBlockStage - 1))
             {
                 // update player position
                 nextPlayerPosition.z += (stageOffSet * 2f);
                 currentBlock++;
-                // update judge time (judge in 12 beats)
-                startJudgeTime += (waitTime * 3f);
-                stopJudgeTime += (waitTime * 3f);
             }
             else if (currentBlock < (numOfBlockStage + numOfPoseOnRoundStage - 1))
             {
                 currentBlock++;
-                // update judge time (judge every 4 beats)
-                startJudgeTime += waitTime;
-                stopJudgeTime += waitTime;
             }
         }
+
         // move the player
         float step = moveSpeed * Time.deltaTime;
         player.transform.position = Vector3.MoveTowards(player.transform.position, nextPlayerPosition, step);
         camera.transform.position = player.transform.position;
 
-        // check position at start point
+        // check gesture at start point
+        if (currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
+        {
+            if (PoseEstimator.instance.Estimate(currentBlock - 1) > threshold)
+            {
+                isPerfect = true;
+            }
+        } else if (currentTime <= (startJudgeTime + gracePeriod))
+        {
+            // late
+            if (PoseEstimator.instance.Estimate(currentBlock - 1) > threshold)
+            {
+                isLate = true;
+            }
+        } else if (currentTime >= (startJudgeTime - gracePeriod))
+        {
+            // early
+            if (PoseEstimator.instance.Estimate(currentBlock - 1) > threshold)
+            {
+                isEarly = true;
+            }
+        }
 
-        // check position within judge period
+        // Display feedback
+        if (currentTime > startJudgeTime + gracePeriod)
+        {
+            if (!isPerfect && !isEarly && !isLate)
+            {
+                feedbackText.text = "Miss";
+            } else if (!isPassCheckPoint) 
+            {
+                feedbackText.text = "Hold the gesture";
+            } else if (isPerfect) {
+                feedbackText.text = "Perfect";
+            } else if (isEarly)
+            {
+                feedbackText.text = "Too early";
+            } else if (isLate)
+            {
+                feedbackText.text = "Too late";
+            }
+        } else
+        {
+            feedbackText.text = "";
+        }
+
+        // check gesture within judge period
         if (currentTime <= stopJudgeTime && currentTime >= startJudgeTime)
         {
             player.GetComponent<Renderer>().material.color = Color.red;
