@@ -17,7 +17,8 @@ public struct Pose {
 	public float Compute(Sequence<float> features){
 		coefficient_seq = coefficient_seq ?? Sequence.Array(coefficient);
 		var exponent = coefficient_seq.MapWith(features, Function.fmul).Reduce(Function.fadd, intercept);
-		return 1 / (1 + Mathf.Exp(-exponent));
+		var h0 = 1 / (1 + Mathf.Exp(-exponent));
+        return h0;
 	}
 }
 
@@ -51,7 +52,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 	void Start () {
 		sensor = KinectSensor.GetDefault();
 		reader = sensor?.BodyFrameSource.OpenReader();
-		//writer = new CSVWriter(logFile);
+		writer = new CSVWriter(logFile);
 
 		if((!sensor?.IsOpen) ?? false) {
 			sensor.Open();
@@ -129,6 +130,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 		
 
 		
+		/*
 		if (loader.IsComplete) {
 			var features = Sequence.Tabulate(100, (int i) => {
 				JointType j = (JointType) (i/4);
@@ -150,10 +152,10 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 
 			var prob = loadedPose.Compute(features);
 			Debug.Log(prob);
-			successIndicator.enabled = prob > 0.5f;
+			successIndicator.enabled = prob > 0.4f;
 		}
+		*/
 
-		/*
 		writer?.Write(Sequence.Tabulate(101, (int i) =>
 		{
 			if (i==100) return isPose;
@@ -174,7 +176,6 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 					return 0;
 			}
 		}), (float v) => v.ToString());
-		*/
 	}
 
 	Vector3 GetRelativePos(KinectSkeleton b, JointType j){

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -563,7 +563,7 @@ MonoBehaviour:
     ThumbRight: {fileID: 0}
     defaultSize: []
     defaultRotation: []
-  logFile: log.csv
+  logFile: log_more.csv
   successIndicator: {fileID: 494613085}
 --- !u!1 &1976635683
 GameObject:
