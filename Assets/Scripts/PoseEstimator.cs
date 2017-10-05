@@ -81,7 +81,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 		foreach(JointType joint in System.Enum.GetValues(typeof(JointType))){
 			//if(joint == JointType.SpineMid) continue;
 			//compute rotation
-			skeleton[joint].rotation = ToQuaternion(body.JointOrientations[joint]);
+			skeleton[joint].rotation = ToQuaternion(body.JointOrientations[joint]) * skeleton.defaultRotation[(int)joint];
 		}
 	}
 

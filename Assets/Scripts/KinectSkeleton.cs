@@ -122,7 +122,7 @@ public struct KinectSkeleton : ICollection<Transform> {
 
 
             if (child.IsSome()) {
-                defaultRotation[i] = Quaternion.FromToRotation(this[i].forward, this[child.Value()].position);
+                defaultRotation[i] = Quaternion.FromToRotation(this[child.Value()].localPosition, Vector3.up);
                 Debug.Log((JointType)i+": "+defaultRotation[i].eulerAngles);
             }
 
