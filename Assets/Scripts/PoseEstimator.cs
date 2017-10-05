@@ -46,7 +46,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 
 	System.Action<Pose> OnPoseWeightLoaded(int i) => (Pose pose) => {
 		poseModels[i] = pose;
-		UnityExecutionThread.instance.ExecuteInMainThread(IncrementLoaded);
+		UnityExecutionThread.instance.ExecuteInMainThread(() => IncrementLoaded());
 	};
 
 	public float Estimate(int poseId){
