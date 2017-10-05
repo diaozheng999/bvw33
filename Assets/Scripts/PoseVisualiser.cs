@@ -16,6 +16,7 @@ public class PoseVisualiser : Singleton<PoseVisualiser> {
         if(_body.IsNone()) return;
         var body = _body.Value();
 
+
         foreach(var joint in PoseProvider.instance.JointTypes()){
             //if(joint == JointType.SpineMid) continue;
             //compute rotation
