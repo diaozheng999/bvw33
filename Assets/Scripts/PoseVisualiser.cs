@@ -25,12 +25,21 @@ public class PoseVisualiser : Singleton<PoseVisualiser> {
             if (child.IsSome())
             {
 
-                var my_pos = PoseProvider.instance.ToVector3(body.Joints[joint]);               
+                var my_pos = PoseProvider.instance.ToVector3(body.Joints[joint]);
                 var child_pos = PoseProvider.instance.ToVector3(body.Joints[child.Value()]);
 
                 var up_dir = transform.TransformVector(child_pos - my_pos);
 
-                skeleton[joint].rotation = Quaternion.LookRotation(transform.forward, up_dir);
+                var rot = Quaternion.LookRotation(up_dir) * Quaternion.Euler(90 * Vector3.right);
+
+                float angle;
+                Vector3 axis;
+
+                rot.ToAngleAxis(out angle, out axis);
+                axis.z *= -1;
+                rot = Quaternion.AngleAxis(-angle, axis);
+
+                skeleton[joint].rotation = rot;
             }
 		}
     }
