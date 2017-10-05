@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -551,7 +551,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.502
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_LocalPosition.z
@@ -559,19 +559,19 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_RootOrder
@@ -579,7 +579,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4330782791629484, guid: 086ff07b03d22b046a60c22d39a7d266, type: 2}
       propertyPath: m_LocalScale.x

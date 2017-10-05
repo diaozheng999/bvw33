@@ -15,13 +15,15 @@ public class GameMaster : MonoBehaviour {
 
     private float startTime;
     private float currentTime;
+
     private float startJudgeTime;
     private float stopJudgeTime;
+
     private float nextGenerateTime;
-    private float startJudgeWaitTime = secondPerBeat * 4f;
-    private float stopJudgeWaitTime = secondPerBeat * 7f;
-    private float waitTime = secondPerBeat * 4f;
     private float generateWaitTime = secondPerBeat * 8f;
+
+    private float nextRoundTime;
+    private float waitTime = secondPerBeat * 4f;
 
     private float perfectPeriod = 0.1f;
     private float gracePeriod = 0.3f;
@@ -71,12 +73,13 @@ public class GameMaster : MonoBehaviour {
     private void SetThePlayer()
     {
         // update judge time
-        startJudgeTime = startTime + startJudgeWaitTime;
-        stopJudgeTime = startTime + stopJudgeWaitTime;
+        startJudgeTime = startTime + secondPerBeat * 4f;
+        stopJudgeTime = startTime + secondPerBeat * 7f;
         // update player position
         nextPlayerPosition = player.transform.position;
         nextPlayerPosition.z += stageOffSet;
         currentBlock++;
+        nextRoundTime = startTime + waitTime * 2f;
     }
 
     void Update () {
@@ -103,6 +106,7 @@ public class GameMaster : MonoBehaviour {
                 nextGenerateTime = float.MaxValue;
             }
         }
+
         // update judge time
         if (currentTime > (stopJudgeTime + gracePeriod))
         {
@@ -127,23 +131,26 @@ public class GameMaster : MonoBehaviour {
         }
 
         // update player position
-        if (currentTime >= (stopJudgeTime + secondPerBeat))
+        if (currentTime >= nextRoundTime)
         {
             if (currentBlock < (numOfBlockStage - 1))
             {
                 // update player position
                 nextPlayerPosition.z += stageOffSet;
                 currentBlock++;
+                nextRoundTime += waitTime * 2f;
             }
             else if (currentBlock == (numOfBlockStage - 1))
             {
                 // update player position
                 nextPlayerPosition.z += (stageOffSet * 2f);
                 currentBlock++;
+                nextRoundTime += waitTime * 3f;
             }
             else if (currentBlock < (numOfBlockStage + numOfPoseOnRoundStage - 1))
             {
                 currentBlock++;
+                nextRoundTime += waitTime;
             }
         }
 
@@ -151,7 +158,8 @@ public class GameMaster : MonoBehaviour {
         float step = moveSpeed * Time.deltaTime;
         player.transform.position = Vector3.MoveTowards(player.transform.position, nextPlayerPosition, step);
         camera.transform.position = player.transform.position;
-        var p = PoseEstimator.instance.Estimate(currentBlock % 3 /* NOTE TO SELF: DON'T HARD CODE THIS! */);
+        float p = 0;
+        // float p = PoseEstimator.instance.Estimate(currentBlock % 3 /* NOTE TO SELF: DON'T HARD CODE THIS! */);
         // check gesture at start point
         if (currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
         {
@@ -160,7 +168,7 @@ public class GameMaster : MonoBehaviour {
             {
                 isPerfect = true;
             }
-        } else if (currentTime <= (startJudgeTime + gracePeriod))
+        } else if (currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + gracePeriod))
         {
             Debug.Log("late time block: " + p + ", pose=" + (currentBlock % 3)+"time =" + currentTime);
             // late
@@ -168,12 +176,9 @@ public class GameMaster : MonoBehaviour {
             {
                 isLate = true;
             }
-        } else if (currentTime >= (startJudgeTime - gracePeriod))
+        } else if (currentTime >= (startJudgeTime - gracePeriod) && currentTime < (startJudgeTime - perfectPeriod))
         {
-            isPerfect = false;
-            isEarly = false;
-            isLate = false;
-            isPassCheckPoint = true;
+            
             Debug.Log("early time block: " + p + ", pose=" + (currentBlock % 3) + "time =" + currentTime);
             // early
             if (p > threshold)
@@ -203,6 +208,10 @@ public class GameMaster : MonoBehaviour {
         } else
         {
             feedbackText.text = "";
+            isPerfect = false;
+            isEarly = false;
+            isLate = false;
+            isPassCheckPoint = true;
         }
 
         // check gesture within judge period
