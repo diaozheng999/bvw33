@@ -152,7 +152,7 @@ public struct KinectSkeleton : ICollection<Transform> {
     public static Option<JointType> PointsAt(JointType joint){
         switch(joint){
             case JointType.SpineBase: return Option.Some(JointType.SpineMid);
-            case JointType.SpineMid: return Option.None<JointType>();
+            case JointType.SpineMid: return Option.Some(JointType.Neck);
             case JointType.Neck: return Option.Some(JointType.Head);
             case JointType.Head: return Option.None<JointType>();
             case JointType.ShoulderLeft: return Option.Some(JointType.ElbowLeft);
@@ -177,8 +177,8 @@ public struct KinectSkeleton : ICollection<Transform> {
 
     public static Option<JointType> GetParent(JointType joint){
         switch(joint){
-            case JointType.SpineBase: return Option.Some(JointType.SpineMid);
-            case JointType.SpineMid: return Option.None<JointType>(); 
+            case JointType.SpineBase: return Option.None<JointType>();
+            case JointType.SpineMid: return Option.Some(JointType.SpineMid); 
             case JointType.Neck: return Option.Some(JointType.SpineShoulder);
             case JointType.Head: return Option.Some(JointType.Neck);
             case JointType.ShoulderLeft: return Option.Some(JointType.SpineShoulder);

@@ -17,16 +17,20 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 
 	[SerializeField] KinectSkeleton skeleton;
 	[SerializeField] KinectSkeleton debugSkeleton;
-	[SerializeField] SkinnedMeshRenderer _renderer;
+
+	[SerializeField] string logFile;
 
     float[] skeletonDimensions;
 
     ulong trackingId = 0;
 
+	CSVWriter writer;
+
 	// Use this for initialization
 	void Start () {
 		sensor = KinectSensor.GetDefault();
 		reader = sensor?.BodyFrameSource.OpenReader();
+		writer = new CSVWriter(logFile);
 
 		if((!sensor?.IsOpen) ?? false) {
 			sensor.Open();
@@ -50,6 +54,8 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 
 		//SkinnedMeshRenderer r = GetComponent<SkinnedMeshRenderer>();
 		skeleton.FillDefaultValues();
+
+		AddDisposable(writer);
 	}
 	
 	void FixedUpdate () {
@@ -87,6 +93,30 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 			    skeleton[joint].rotation = ToQuaternion(body.JointOrientations[child.Value()]) * skeleton.defaultRotation[(int)joint];
             }
 		}
+		
+		float isPose = Input.GetKey(KeyCode.Space) ? 1f : 0f;
+
+		writer?.Write(Sequence.Tabulate(101, (int i) =>
+		{
+			if (i==100) return isPose;
+			
+			JointType j = (JointType) (i/4);
+			var quaternion = body.JointOrientations[j].Orientation;
+
+			switch (i%4) {
+				case 0:
+					return quaternion.X;
+				case 1:
+					return quaternion.Y;
+				case 2:
+					return quaternion.Z;
+				case 3:
+					return quaternion.W;
+				default:
+					return 0;
+			}
+		}), (float v) => v.ToString());
+
 	}
 
 	Vector3 GetRelativePos(KinectSkeleton b, JointType j){
