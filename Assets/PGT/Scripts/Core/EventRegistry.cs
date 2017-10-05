@@ -134,6 +134,7 @@
         )
         {
             Event = (context == null) ? Event : EventRegistry.instance.PrivateEvent(context, Event);
+            Debug.Log("Event: "+Event);
             ReturnState persistence = persistent ? ReturnState.Keep : ReturnState.Done;
             return EventRegistry.instance.AddEventListener(Event, (object t) =>
             {
@@ -258,7 +259,7 @@
         public int AddEventListener(string Event, Callback listener)
         {
             //check for late listeners
-            RemoteDebug.RemoteDebug.instance?.Log("[EventRegistry] Adding listener to event \"" + Event + "\"");
+            Debug.Log("[EventRegistry] Adding listener to event \"" + Event + "\"");
 
 
             if (lateEvents != null && lateEvents.ContainsKey(Event) &&
@@ -280,7 +281,7 @@
             }
             else
             {
-                RemoteDebug.RemoteDebug.instance?.Log("[EventRegistry] Adding a listener within another event listener. The listener will only be added after all events in this frame have been called.");
+                Debug.Log("[EventRegistry] Adding a listener within another event listener. The listener will only be added after all events in this frame have been called.");
                 AddEventListenerQueue.Enqueue(() =>
                 {
                     if (!registry.ContainsKey(Event))
@@ -381,12 +382,12 @@
             }
             if (!registry.ContainsKey(Event))
             {
-                RemoteDebug.RemoteDebug.instance?.Log("[EventRegistry] Invoking event \"" + Event + "\" with no listener(s).");
+                Debug.Log("[EventRegistry] Invoking event \"" + Event + "\" with no listener(s).");
                 isInvoking = false;
                 return;
             }
 
-            RemoteDebug.RemoteDebug.instance?.Log("[EventRegistry] Invoking event \"" + Event + "\" with " + registry[Event].Count + " listener(s).");
+            Debug.Log("[EventRegistry] Invoking event \"" + Event + "\" with " + registry[Event].Count + " listener(s).");
 
             List<int> removals = new List<int>();
             foreach(KeyValuePair<int, Callback> listener in registry[Event])
@@ -480,10 +481,10 @@
             }
             else
             {
-                RemoteDebug.RemoteDebug.instance?.Log("[EventRegistry] Removing a listener within another event listener. The listener will only be added after all events in this frame have been called.");
+                Debug.LogWarning("[EventRegistry] Removing a listener within another event listener. The listener will only be added after all events in this frame have been called.");
                 AddEventListenerQueue.Enqueue(() =>
                 {
-                    RemoteDebug.RemoteDebug.instance?.Log("[EventRegistry] Delayed event listener(s) removed. (Event: \"" + Event + "\")");
+                    Debug.LogWarning("[EventRegistry] Delayed event listener(s) removed. (Event: \"" + Event + "\")");
                     if (id < 0) registry[Event] = new Dictionary<int, Callback>();
                     if (!registry[Event].ContainsKey(id)) return;
                     else registry[Event].Remove(id);
