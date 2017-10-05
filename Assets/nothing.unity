@@ -567,7 +567,7 @@ MonoBehaviour:
     ThumbRight: {fileID: 0}
     defaultSize: []
     defaultRotation: []
-  logFile: log_more.csv
+  logFile: log_pose2_1.csv
   successIndicator: {fileID: 494613085}
 --- !u!1 &1976635683
 GameObject:
