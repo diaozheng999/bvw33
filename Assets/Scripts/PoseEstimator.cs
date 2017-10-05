@@ -121,7 +121,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
             var child = KinectSkeleton.PointsAt(joint);
             if (child.IsSome())
             {
-			    skeleton[joint].rotation = ToQuaternion(body.JointOrientations[child.Value()]) * skeleton.defaultRotation[(int)joint];
+                skeleton[joint].rotation = ToQuaternion(body.JointOrientations[child.Value()]);// * skeleton.defaultRotation[(int)joint];
             }
 		}
 		
@@ -130,7 +130,6 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 		
 
 		
-		/*
 		if (loader.IsComplete) {
 			var features = Sequence.Tabulate(100, (int i) => {
 				JointType j = (JointType) (i/4);
@@ -154,8 +153,8 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 			Debug.Log(prob);
 			successIndicator.enabled = prob > 0.4f;
 		}
-		*/
 
+		/*
 		writer?.Write(Sequence.Tabulate(101, (int i) =>
 		{
 			if (i==100) return isPose;
@@ -176,6 +175,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 					return 0;
 			}
 		}), (float v) => v.ToString());
+		*/
 	}
 
 	Vector3 GetRelativePos(KinectSkeleton b, JointType j){
