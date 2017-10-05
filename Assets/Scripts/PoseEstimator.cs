@@ -79,9 +79,13 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 		if (body == null) return;
 
 		foreach(JointType joint in System.Enum.GetValues(typeof(JointType))){
-			//if(joint == JointType.SpineMid) continue;
-			//compute rotation
-			skeleton[joint].rotation = ToQuaternion(body.JointOrientations[joint]) * skeleton.defaultRotation[(int)joint];
+            //if(joint == JointType.SpineMid) continue;
+            //compute rotation
+            var child = KinectSkeleton.PointsAt(joint);
+            if (child.IsSome())
+            {
+			    skeleton[joint].rotation = ToQuaternion(body.JointOrientations[child.Value()]) * skeleton.defaultRotation[(int)joint];
+            }
 		}
 	}
 
