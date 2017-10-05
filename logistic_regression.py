@@ -18,9 +18,8 @@ model = LogisticRegression()
 
 
 
-model.fit(x3, y3)
+model.fit(x3, y3)   
 model.fit(x2, y2)
-model.fit(x1, y1)
 
 _d  = {
     'coefficient' : model.coef_.tolist()[0],
