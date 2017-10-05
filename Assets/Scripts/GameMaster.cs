@@ -151,27 +151,34 @@ public class GameMaster : MonoBehaviour {
         float step = moveSpeed * Time.deltaTime;
         player.transform.position = Vector3.MoveTowards(player.transform.position, nextPlayerPosition, step);
         camera.transform.position = player.transform.position;
-
+        var p = PoseEstimator.instance.Estimate(currentBlock % 3 /* NOTE TO SELF: DON'T HARD CODE THIS! */);
         // check gesture at start point
         if (currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
         {
-            if (PoseEstimator.instance.Estimate(currentBlock - 1) > threshold)
+            Debug.Log("perfect time block: "+p+", pose="+(currentBlock % 3)+ "time ="+ currentTime);
+            if (p > threshold)
             {
                 isPerfect = true;
             }
         } else if (currentTime <= (startJudgeTime + gracePeriod))
         {
+            Debug.Log("late time block: " + p + ", pose=" + (currentBlock % 3)+"time =" + currentTime);
             // late
-            if (PoseEstimator.instance.Estimate(currentBlock - 1) > threshold)
+            if (p > threshold)
             {
                 isLate = true;
             }
         } else if (currentTime >= (startJudgeTime - gracePeriod))
         {
+            isPerfect = false;
+            isEarly = false;
+            isLate = false;
+            isPassCheckPoint = true;
+            Debug.Log("early time block: " + p + ", pose=" + (currentBlock % 3) + "time =" + currentTime);
             // early
-            if (PoseEstimator.instance.Estimate(currentBlock - 1) > threshold)
+            if (p > threshold)
             {
-                isEarly = true;
+                //isEarly = true;
             }
         }
 
