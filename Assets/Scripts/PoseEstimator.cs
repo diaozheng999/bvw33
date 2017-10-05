@@ -2,9 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using PGT.Core;
+using PGT.Core.Func;
 using PGT.Core.DataStructures;
 
 using Windows.Kinect;
+
+
+public struct Pose {
+	public float[] coefficient;
+	public float intercept;
+
+	Sequence<float> coefficient_seq;
+
+	public float Compute(Sequence<float> features){
+		coefficient_seq = coefficient_seq ?? Sequence.Array(coefficient);
+		var exponent = coefficient_seq.MapWith(features, Function.fmul).Reduce(Function.fadd, intercept);
+		return 1 / (1 + Mathf.Exp(-exponent));
+	}
+}
 
 public class PoseEstimator : Singleton<PoseEstimator> {
 
@@ -20,9 +35,15 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 
 	[SerializeField] string logFile;
 
+	[SerializeField] Renderer successIndicator;
+
     float[] skeletonDimensions;
 
     ulong trackingId = 0;
+
+	JsonLoader<Pose> loader;
+
+	Pose loadedPose;
 
 	CSVWriter writer;
 
@@ -30,13 +51,16 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 	void Start () {
 		sensor = KinectSensor.GetDefault();
 		reader = sensor?.BodyFrameSource.OpenReader();
-		writer = new CSVWriter(logFile);
+		//writer = new CSVWriter(logFile);
 
 		if((!sensor?.IsOpen) ?? false) {
 			sensor.Open();
 		}
 
 		data = new Body[MAX_BODY_COUNT];
+
+		loader = new JsonLoader<Pose>("pose1", true);
+		loader.LoadJson(OnPoseWeightLoaded, true);
 
 		AddDisposable(reader);
 		AddDisposable(sensor.Close);
@@ -56,8 +80,13 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 		skeleton.FillDefaultValues();
 
 		AddDisposable(writer);
+
 	}
-	
+
+	void OnPoseWeightLoaded(Pose pose){
+		loadedPose = pose;
+	}
+
 	void FixedUpdate () {
 		using (var frame = reader?.AcquireLatestFrame()) {
 			frame?.GetAndRefreshBodyData(data);
@@ -82,6 +111,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
             }
         }
 
+
 		if (body == null) return;
 
 		foreach(JointType joint in System.Enum.GetValues(typeof(JointType))){
@@ -96,6 +126,34 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 		
 		float isPose = Input.GetKey(KeyCode.Space) ? 1f : 0f;
 
+		
+
+		
+		if (loader.IsComplete) {
+			var features = Sequence.Tabulate(100, (int i) => {
+				JointType j = (JointType) (i/4);
+				var quaternion = body.JointOrientations[j].Orientation;
+
+				switch (i%4) {
+					case 0:
+						return quaternion.X;
+					case 1:
+						return quaternion.Y;
+					case 2:
+						return quaternion.Z;
+					case 3:
+						return quaternion.W;
+					default:
+						return 0;
+				}
+			});
+
+			var prob = loadedPose.Compute(features);
+			Debug.Log(prob);
+			successIndicator.enabled = prob > 0.5f;
+		}
+
+		/*
 		writer?.Write(Sequence.Tabulate(101, (int i) =>
 		{
 			if (i==100) return isPose;
@@ -116,7 +174,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 					return 0;
 			}
 		}), (float v) => v.ToString());
-
+		*/
 	}
 
 	Vector3 GetRelativePos(KinectSkeleton b, JointType j){
