@@ -1,10 +1,19 @@
 import pandas as pd
 import json
 import io
+import sys
+
 from sklearn.linear_model import LogisticRegression
 
 
-data = pd.read_csv('log_pose2_1.csv', header=None)
+
+model = LogisticRegression()
+
+for _f in sys.argv[1:]:
+    data = pd.read_csv(_f+'.csv', header=None)
+    x = data[range(100)]
+    y = data[100]
+    model.fit(x, y)
 
 '''
 data1 = pd.read_csv("log3.csv", header=None)
@@ -23,7 +32,6 @@ x4 = data3[range(100)]
 y4 = data3[100]
 '''
 
-model = LogisticRegression()
 
 '''
 model.fit(x4, y4)
@@ -41,9 +49,7 @@ _d  = {
     'intercept' : model.intercept_[0]
 }
 
-with file('pose2.json', 'w') as f:
-  f.write(json.dumps(_d))
-
+print json.dumps(_d)
 
 def accuracy(y_true, y_pred):
     return (y_true==y_pred).sum() / float(len(y_true))
