@@ -35,10 +35,17 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 
         skeletonDimensions = new float[25];
 
-        for(int i=1; i<25; ++i)
+        for(int i=0; i<25; ++i)
         {
-            var parent = KinectSkeleton.GetParent((JointType)i).Value();
+            var _p = KinectSkeleton.GetParent((JointType)i);
+            if (_p.IsNone()) continue;
+            var parent = _p.Value();
             skeletonDimensions[i] = (skeleton[i].transform.position - skeleton[parent].transform.position).magnitude;
+        }
+
+        foreach(var p in skeletonDimensions)
+        {
+            Debug.Log(p);
         }
 	}
 	
@@ -69,21 +76,23 @@ public class PoseEstimator : Singleton<PoseEstimator> {
         
 		if (body==null) return;
         Debug.Log(body?.Joints[JointType.HandRight].Position.Y);
-		foreach(JointType joint in System.Enum.GetValues(typeof(JointType))){
-			if(joint == JointType.SpineBase) continue;
-			skeleton[joint].localRotation =  GetRotation(body, joint); 
-
-		}
+        foreach (JointType joint in System.Enum.GetValues(typeof(JointType)))
+        {
+            
+            if (joint == JointType.SpineMid) continue;
+            //skeleton[joint].localRotation =  GetRotation(body, joint);
+            skeleton[joint].localPosition = GetRelativePos(body, joint) * skeletonDimensions[(int)joint];
+            
+            //skeleton[joint].position = ToVector3(body.Joints[joint]);
+        }
 	}
 
-	Quaternion GetRotation(Body b, JointType j){
+	Vector3 GetRelativePos(Body b, JointType j){
 		var parent = KinectSkeleton.GetParent(j).Value();
-
-		var dir = ToVector3(b.Joints[j]) - ToVector3(b.Joints[parent]);
-
-		var localRot = Quaternion.LookRotation(dir, Vector3.up);
-
-		return localRot;
+        
+        var dir = ToVector3(b.Joints[j]) - ToVector3(b.Joints[parent]);
+        
+		return dir.normalized;
 	}
 
 

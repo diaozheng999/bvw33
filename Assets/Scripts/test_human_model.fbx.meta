@@ -1,0 +1,139 @@
+fileFormatVersion: 2
+guid: a5b68b975acc4b44f845d98d88e7c01d
+timeCreated: 1507163547
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: girl2
+    100002: JOINTTYPE_ANKLELEFT
+    100004: JOINTTYPE_ANKLERIGHT
+    100006: JOINTTYPE_ELBOWLEFT
+    100008: JOINTTYPE_ELBOWRIGHT
+    100010: JOINTTYPE_FOOTLEFT
+    100012: JOINTTYPE_FOOTRIGHT
+    100014: JOINTTYPE_HANDLEFT
+    100016: JOINTTYPE_HANDRIGHT
+    100018: JOINTTYPE_HANDTIPLEFT
+    100020: JOINTTYPE_HANDTIPRIGHT
+    100022: JOINTTYPE_HEAD
+    100024: JOINTTYPE_HIPLEFT
+    100026: JOINTTYPE_HIPRIGHT
+    100028: JOINTTYPE_KNEELEFT
+    100030: JOINTTYPE_KNEERIGHT
+    100032: JOINTTYPE_NECK
+    100034: JOINTTYPE_SHOULDERLEFT
+    100036: JOINTTYPE_SHOULDERRIGHT
+    100038: JOINTTYPE_SPINEBASE
+    100040: JOINTTYPE_SPINEMID
+    100042: JOINTTYPE_SPINESHOULDER
+    100044: JOINTTYPE_THUMBLEFT
+    100046: JOINTTYPE_THUMBRIGHT
+    100048: JOINTTYPE_WRISTLEFT
+    100050: JOINTTYPE_WRISTRIGHT
+    100052: //RootNode
+    400000: girl2
+    400002: JOINTTYPE_ANKLELEFT
+    400004: JOINTTYPE_ANKLERIGHT
+    400006: JOINTTYPE_ELBOWLEFT
+    400008: JOINTTYPE_ELBOWRIGHT
+    400010: JOINTTYPE_FOOTLEFT
+    400012: JOINTTYPE_FOOTRIGHT
+    400014: JOINTTYPE_HANDLEFT
+    400016: JOINTTYPE_HANDRIGHT
+    400018: JOINTTYPE_HANDTIPLEFT
+    400020: JOINTTYPE_HANDTIPRIGHT
+    400022: JOINTTYPE_HEAD
+    400024: JOINTTYPE_HIPLEFT
+    400026: JOINTTYPE_HIPRIGHT
+    400028: JOINTTYPE_KNEELEFT
+    400030: JOINTTYPE_KNEERIGHT
+    400032: JOINTTYPE_NECK
+    400034: JOINTTYPE_SHOULDERLEFT
+    400036: JOINTTYPE_SHOULDERRIGHT
+    400038: JOINTTYPE_SPINEBASE
+    400040: JOINTTYPE_SPINEMID
+    400042: JOINTTYPE_SPINESHOULDER
+    400044: JOINTTYPE_THUMBLEFT
+    400046: JOINTTYPE_THUMBRIGHT
+    400048: JOINTTYPE_WRISTLEFT
+    400050: JOINTTYPE_WRISTRIGHT
+    400052: //RootNode
+    4300000: girl2
+    9500000: //RootNode
+    13700000: girl2
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
