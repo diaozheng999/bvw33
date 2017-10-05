@@ -71,14 +71,19 @@ public class PoseEstimator : Singleton<PoseEstimator> {
         Debug.Log(body?.Joints[JointType.HandRight].Position.Y);
 		foreach(JointType joint in System.Enum.GetValues(typeof(JointType))){
 			if(joint == JointType.SpineBase) continue;
-			skeleton[joint].localPosition =  GetDirection(body, joint); 
+			skeleton[joint].localRotation =  GetRotation(body, joint); 
 
 		}
 	}
 
-	Vector3 GetDirection(Body b, JointType j){
+	Quaternion GetRotation(Body b, JointType j){
 		var parent = KinectSkeleton.GetParent(j).Value();
-		return (ToVector3(b.Joints[j]) - ToVector3(b.Joints[parent])).normalized;
+
+		var dir = ToVector3(b.Joints[j]) - ToVector3(b.Joints[parent]);
+
+		var localRot = Quaternion.LookRotation(dir, Vector3.up);
+
+		return localRot;
 	}
 
 
