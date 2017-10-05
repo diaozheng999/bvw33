@@ -60,7 +60,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 
 		data = new Body[MAX_BODY_COUNT];
 
-		loader = new JsonLoader<Pose>("pose1", true);
+		loader = new JsonLoader<Pose>("pose2", true);
 		loader.LoadJson(OnPoseWeightLoaded, true);
 
 		AddDisposable(reader);
