@@ -71,7 +71,7 @@ public class PoseProvider : Singleton<PoseProvider> {
 
 	public Option<Body> GetCurrentTrackedBody() {
 		var _body = PoseProvider.instance.GetFirstTrackedBody(trackingId);
-        if(_body.IsNone()) Option.None<Body>();
+        if(_body.IsNone()) return Option.None<Body>();
         var _tup = _body.Value();
 
         trackingId = _tup.car;

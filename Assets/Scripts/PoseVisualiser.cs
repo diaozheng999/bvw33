@@ -23,7 +23,9 @@ public class PoseVisualiser : Singleton<PoseVisualiser> {
             var child = KinectSkeleton.PointsAt(joint);
             if (child.IsSome())
             {
-                skeleton[joint].rotation = PoseProvider.instance.ToQuaternion(body.JointOrientations[child.Value()]);
+                var rot = PoseProvider.instance.ToQuaternion(body.JointOrientations[child.Value()]);
+                //var nrot = Quaternion.Euler(transform.TransformDirection(rot.eulerAngles));
+                skeleton[joint].rotation =  rot * transform.rotation;
             }
 		}
     }
