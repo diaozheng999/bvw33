@@ -110,6 +110,12 @@ public class GameMaster : MonoBehaviour {
         // update judge time
         if (currentTime > (stopJudgeTime + gracePeriod))
         {
+            feedbackText.text = "";
+            isPerfect = false;
+            isEarly = false;
+            isLate = false;
+            isPassCheckPoint = true;
+            Debug.Log("reset bool");
             if (currentBlock < (numOfBlockStage - 1))
             {
                 // update judge time (judge every 8 beats)
@@ -158,19 +164,19 @@ public class GameMaster : MonoBehaviour {
         float step = moveSpeed * Time.deltaTime;
         player.transform.position = Vector3.MoveTowards(player.transform.position, nextPlayerPosition, step);
         camera.transform.position = player.transform.position;
-        float p = 0;
-        // float p = PoseEstimator.instance.Estimate(currentBlock % 3 /* NOTE TO SELF: DON'T HARD CODE THIS! */);
+        // float p = 0;
+        float p = PoseEstimator.instance.Estimate((currentBlock-1) % 3 /* NOTE TO SELF: DON'T HARD CODE THIS! */);
         // check gesture at start point
         if (currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
         {
-            Debug.Log("perfect time block: "+p+", pose="+(currentBlock % 3)+ "time ="+ currentTime);
+            Debug.Log("perfect time block: "+p+", pose="+((currentBlock - 1) % 3));
             if (p > threshold)
             {
                 isPerfect = true;
             }
         } else if (currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + gracePeriod))
         {
-            Debug.Log("late time block: " + p + ", pose=" + (currentBlock % 3)+"time =" + currentTime);
+            Debug.Log("late time block: " + p + ", pose=" + ((currentBlock - 1) % 3 ));
             // late
             if (p > threshold)
             {
@@ -179,11 +185,11 @@ public class GameMaster : MonoBehaviour {
         } else if (currentTime >= (startJudgeTime - gracePeriod) && currentTime < (startJudgeTime - perfectPeriod))
         {
             
-            Debug.Log("early time block: " + p + ", pose=" + (currentBlock % 3) + "time =" + currentTime);
+            Debug.Log("early time block: " + p + ", pose=" + ((currentBlock - 1) % 3));
             // early
             if (p > threshold)
             {
-                //isEarly = true;
+                isEarly = true;
             }
         }
 
@@ -196,22 +202,15 @@ public class GameMaster : MonoBehaviour {
             } else if (!isPassCheckPoint) 
             {
                 feedbackText.text = "Hold the gesture";
-            } else if (isPerfect) {
-                feedbackText.text = "Perfect";
             } else if (isEarly)
             {
                 feedbackText.text = "Too early";
-            } else if (isLate)
+            } else if (isPerfect) {
+                feedbackText.text = "Perfect";
+            }  else if (isLate)
             {
                 feedbackText.text = "Too late";
             }
-        } else
-        {
-            feedbackText.text = "";
-            isPerfect = false;
-            isEarly = false;
-            isLate = false;
-            isPassCheckPoint = true;
         }
 
         // check gesture within judge period
