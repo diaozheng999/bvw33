@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace PGT.Core
 {
@@ -19,5 +20,15 @@ namespace PGT.Core
             }
         }
 
+        public static Transform FindRec(this Transform transform, string child){
+            var n = transform.childCount;
+            var attempt = transform.Find(child);
+            if (attempt != null) return attempt;
+            for(int i=0; i<n; ++i){
+                attempt = transform.GetChild(i).FindRec(child);
+                if(attempt != null) return attempt;
+            }
+            return null;
+        }
     }
 }

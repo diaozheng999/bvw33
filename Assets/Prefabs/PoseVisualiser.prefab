@@ -1567,14 +1567,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1566879813923282}
-  m_LocalRotation: {x: 0.40962577, y: -0.16329151, z: -0.122399956, w: 0.88913494}
+  m_LocalRotation: {x: -0.010317174, y: -0.095196374, z: -0.18050906, w: 0.9789013}
   m_LocalPosition: {x: 1.5169346e-12, y: 0.020995505, z: -3.3208009e-10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4332509124666164}
   m_Father: {fileID: 4860679793478354}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -3.1280003, y: -10.540001, z: -20.607}
 --- !u!4 &4513741426097278
 Transform:
   m_ObjectHideFlags: 1
@@ -1666,14 +1666,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1924933752974286}
-  m_LocalRotation: {x: -0.07206933, y: -0.09063932, z: 0.0110481, w: 0.9932112}
+  m_LocalRotation: {x: -0.05684389, y: -0.10088719, z: -0.14600907, w: 0.98248255}
   m_LocalPosition: {x: 9.0898616e-13, y: 0.009526526, z: 1.5477397e-13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4583768105977606}
   m_Father: {fileID: 4332509124666164}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -8.115001, y: -10.5720005, z: -16.154001}
 --- !u!4 &4563191670294950
 Transform:
   m_ObjectHideFlags: 1
@@ -1982,14 +1982,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1764811097446498}
-  m_LocalRotation: {x: 0.5198902, y: -0.43836945, z: 0.63936, w: 0.35883868}
+  m_LocalRotation: {x: 0.3698715, y: -0.6270185, z: 0.45584744, w: 0.5120997}
   m_LocalPosition: {x: -0.009936928, y: 0.009389715, z: -0.000012282091}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4499244524125846}
   m_Father: {fileID: 4985118652704462}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 71.892006, y: -101.114006, z: 0.56200004}
 --- !u!4 &4876836499066840
 Transform:
   m_ObjectHideFlags: 1
@@ -2207,24 +2207,24 @@ MonoBehaviour:
     ShoulderLeft: {fileID: 4860679793478354}
     ElbowLeft: {fileID: 4499244524125846}
     WristLeft: {fileID: 4332509124666164}
-    HandLeft: {fileID: 4546182202159996}
+    HandLeft: {fileID: 0}
     ShoulderRight: {fileID: 4983317013671380}
     ElbowRight: {fileID: 4876836499066840}
     WristRight: {fileID: 4273780481177886}
-    HandRight: {fileID: 4442091406578124}
-    HipLeft: {fileID: 4563917861640168}
-    KneeLeft: {fileID: 4234029591706588}
-    AnkleLeft: {fileID: 4642495188049112}
-    FootLeft: {fileID: 4940240569507178}
-    HipRight: {fileID: 4181748311514130}
-    KneeRight: {fileID: 4773416402251942}
-    AnkleRight: {fileID: 4940240569507178}
-    FootRight: {fileID: 4301858878532022}
+    HandRight: {fileID: 0}
+    HipLeft: {fileID: 0}
+    KneeLeft: {fileID: 4563917861640168}
+    AnkleLeft: {fileID: 4234029591706588}
+    FootLeft: {fileID: 0}
+    HipRight: {fileID: 0}
+    KneeRight: {fileID: 4181748311514130}
+    AnkleRight: {fileID: 4773416402251942}
+    FootRight: {fileID: 0}
     SpineShoulder: {fileID: 4985118652704462}
-    HandTipLeft: {fileID: 4383112568942470}
-    ThumbLeft: {fileID: 4583768105977606}
-    HandTipRight: {fileID: 4053028821786618}
-    ThumbRight: {fileID: 4530749822951030}
+    HandTipLeft: {fileID: 0}
+    ThumbLeft: {fileID: 0}
+    HandTipRight: {fileID: 0}
+    ThumbRight: {fileID: 0}
     defaultSize: []
     defaultRotation: []
 --- !u!137 &137891294623874340

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Windows.Kinect;
+using PGT.Core;
 using PGT.Core.Func;
 
 [System.Serializable]
@@ -272,6 +273,25 @@ public struct KinectSkeleton : ICollection<Transform> {
                 default: throw new System.IndexOutOfRangeException();
             }
         }
+    }
+
+    public void FillMixamo(Transform transform, string mixamoPrefix){    
+        Debug.Log("Hello World!");
+        SpineBase = transform.FindRec(mixamoPrefix+"Hips");
+        SpineMid = SpineBase.FindRec(mixamoPrefix+"Spine1");
+        SpineShoulder = transform.FindRec(mixamoPrefix+"Spine2");
+        Neck = transform.FindRec(mixamoPrefix+"Neck");
+        Head = transform.FindRec(mixamoPrefix+"Head");
+        ShoulderLeft = transform.FindRec(mixamoPrefix+"LeftShoulder");
+        ElbowLeft = transform.FindRec(mixamoPrefix+"LeftArm");
+        WristLeft = transform.FindRec(mixamoPrefix+"LeftForeArm");
+        ShoulderRight = transform.FindRec(mixamoPrefix+"RightShoulder");
+        ElbowRight = transform.FindRec(mixamoPrefix+"RightArm");
+        WristRight = transform.FindRec(mixamoPrefix+"RightForeArm");
+        KneeLeft = transform.FindRec(mixamoPrefix+"LeftUpLeg");
+        AnkleLeft = transform.FindRec(mixamoPrefix+"LeftLeg");
+        KneeRight = transform.FindRec(mixamoPrefix+"RightUpLeg");
+        AnkleRight = transform.FindRec(mixamoPrefix+"RightLeg");
     }
 
 }

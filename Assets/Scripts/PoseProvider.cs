@@ -13,6 +13,9 @@ public class PoseProvider : Singleton<PoseProvider> {
 
 	const int MAX_BODY_COUNT = 6;
 
+	[SerializeField] bool damp;
+	[SerializeField] int dampBufferSize;
+
 	KinectSensor sensor = null;
 	BodyFrameReader reader = null;
 
@@ -22,7 +25,11 @@ public class PoseProvider : Singleton<PoseProvider> {
 
 	Pose loadedPose;
 
+	public Windows.Kinect.Vector4 floorClipPlane;
+
 	JointType[] jointTypes;
+
+	QuaternionDamper[] dampers;
 
 	// Use this for initialization
 	void Start () {
@@ -37,6 +44,13 @@ public class PoseProvider : Singleton<PoseProvider> {
 
 		jointTypes = (JointType[])System.Enum.GetValues(typeof(JointType));
 
+		if(damp){
+			dampers = new QuaternionDamper[25];
+			foreach(var jointType in jointTypes){
+				dampers[(int)jointType] = new QuaternionDamper(dampBufferSize);
+			}
+		}
+
 		AddDisposable(reader);
 		AddDisposable(sensor.Close);
 	}
@@ -44,6 +58,17 @@ public class PoseProvider : Singleton<PoseProvider> {
 	void FixedUpdate () {
 		using (var frame = reader?.AcquireLatestFrame()) {
 			frame?.GetAndRefreshBodyData(data);
+			if (frame != null)
+				floorClipPlane = frame.FloorClipPlane;
+		}
+
+		if(damp){
+			var _body = GetCurrentTrackedBody();
+			if(_body.IsNone()) return;
+			var body = _body.Value();
+			foreach(var joint in jointTypes){
+				dampers[(int)joint].Update(ToQuaternion(body.JointOrientations[joint]));
+			}
 		}
 	}
 
@@ -119,5 +144,9 @@ public class PoseProvider : Singleton<PoseProvider> {
 
 	public Quaternion ToQuaternion(JointOrientation j){
 		return new Quaternion(j.Orientation.X, j.Orientation.Y, j.Orientation.Z, j.Orientation.W);
+	}
+
+	public Quaternion GetDampedQuaternion(JointType joint){
+		return dampers[(int)joint].Value();
 	}
 }
