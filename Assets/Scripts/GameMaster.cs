@@ -8,7 +8,7 @@ public class GameMaster : MonoBehaviour {
     private static float BPM = 120.0f;
     private static float secondPerBeat = 60.0f / BPM;
 
-    private float gameDelay = 0.0f;
+    private float gameDelay = 0.05f;
     
     private static float stageOffSet = 5f;
     private float currentStagePosition = 0;
@@ -28,15 +28,18 @@ public class GameMaster : MonoBehaviour {
     private float nextRoundTime;
     private float waitTime = secondPerBeat * 4f;
 
-    private float perfectPeriod = 0.3f;
-    private float gracePeriod = 0.5f;
+    private float perfectPeriod = 0.5f; // 1s in total
+    private float earlyGracePeriod = 0.6f;
+    private float lateGracePeriod = 0.8f;
 
     private float moveSpeed = stageOffSet / (secondPerBeat * 3f);
 
     private int currentBlock = 0;
     private int numOfGeneratedBlock = 0;
-    private int numOfBlockStage = 10;
-    private int numOfPoseOnRoundStage = 5;
+    private int numOfBlockStage = 9; /* total number of poses is numOfBlockStage - 1 */
+    private int numOfPoseOnRoundStage = 4;
+
+    private int numOfPose = 4;
 
     [SerializeField]
     private GameObject stageGenerator;
@@ -44,7 +47,8 @@ public class GameMaster : MonoBehaviour {
     private GameObject model1;
     [SerializeField]
     private GameObject model2;
-    [SerializeField] GameObject visualiser;
+    [SerializeField]
+    private GameObject visualiser;
     [SerializeField]
     private GameObject camera;
     [SerializeField]
@@ -54,6 +58,7 @@ public class GameMaster : MonoBehaviour {
 
     private float threshold = 0.4f;
 
+    private bool isMoveCamera = false;
     private bool isStart = false;
     private bool isOver = false;
 
@@ -66,6 +71,10 @@ public class GameMaster : MonoBehaviour {
     private Text feedbackText;
     [SerializeField]
     private Image instructionImage;
+    [SerializeField]
+    private Text readyText;
+    [SerializeField]
+    private Button startButton;
     public Sprite[] instructions;
 
     private string model1StartAnimationTriggerName;
@@ -79,13 +88,27 @@ public class GameMaster : MonoBehaviour {
 
     public void StartGame()
     {
-        StartCoroutine(DelayedStartTime());
         StartCoroutine(PlayDrumSound());
+        StartCoroutine(DelayedStartTime());
     }
+
 
     private IEnumerator DelayedStartTime()
     {
         yield return new WaitForSeconds(gameDelay);
+        Destroy(startButton.gameObject);
+        readyText.text = "Ready?";
+        isMoveCamera = true;
+        yield return new WaitForSeconds(waitTime);
+        readyText.text = "3";
+        yield return new WaitForSeconds(secondPerBeat);
+        readyText.text = "2";
+        yield return new WaitForSeconds(secondPerBeat);
+        readyText.text = "1";
+        yield return new WaitForSeconds(secondPerBeat);
+        readyText.text = "Go";
+        yield return new WaitForSeconds(secondPerBeat);
+        readyText.text = "";
         isStart = true;
         startTime = Time.time;
         nextGenerateTime = startTime + generateWaitTime;
@@ -93,6 +116,7 @@ public class GameMaster : MonoBehaviour {
         SetThePlayer();
         SetTheInstruction();
         SetPoseAnimation();
+        
     }
        
 
@@ -126,15 +150,15 @@ public class GameMaster : MonoBehaviour {
 
     private void SetTheInstruction()
     {
-        instructionImage.sprite = instructions[(currentBlock - 1) % 3]; /* NOTE TO SELF: DON'T HARD CODE THIS! */
+        instructionImage.sprite = instructions[(currentBlock - 1) % numOfPose]; 
     }
 
     private void SetPoseAnimation()
     {
-        model1StartAnimationTriggerName = "StartPose" + ((currentBlock - 1) % 3 + 1);
-        model1EndAnimationTriggerName = "EndPose" + ((currentBlock - 1) % 3 + 1);
-        model2StartAnimationTriggerName = "StartPose" + ((currentBlock) % 3 + 1);
-        model2EndAnimationTriggerName = "EndPose" + ((currentBlock) % 3 + 1);
+        model1StartAnimationTriggerName = "StartPose" + ((currentBlock - 1) % numOfPose + 1);
+        model1EndAnimationTriggerName = "EndPose" + ((currentBlock - 1) % numOfPose + 1);
+        model2StartAnimationTriggerName = "StartPose" + ((currentBlock) % numOfPose + 1);
+        model2EndAnimationTriggerName = "EndPose" + ((currentBlock) % numOfPose + 1);
     }
 
     private IEnumerator PlayDrumSound()
@@ -147,6 +171,12 @@ public class GameMaster : MonoBehaviour {
     }
 
     void Update () {
+        if (!isStart && isMoveCamera)
+        {
+            float step = 0.5f / (secondPerBeat * 3) * Time.deltaTime;
+            camera.transform.position = Vector3.MoveTowards(camera.transform.position, model1.transform.position, step);
+        }  
+
         if (isStart)
         {
             currentTime = Time.time;
@@ -174,7 +204,7 @@ public class GameMaster : MonoBehaviour {
             }
 
             // update judge time
-            if (currentTime > (stopJudgeTime + gracePeriod))
+            if (currentTime > (stopJudgeTime + secondPerBeat/2 ))
             {
                 feedbackText.text = "";
                 isPerfect = false;
@@ -253,28 +283,29 @@ public class GameMaster : MonoBehaviour {
                 model2.GetComponent<Animator>().SetTrigger("TurnRight");
             }
 
-
-
-            float p = PoseEstimator.instance.Estimate((currentBlock-1) % 3 /* NOTE TO SELF: DON'T HARD CODE THIS! */);
+            float p = 0;
+            // float p = PoseEstimator.instance.Estimate((currentBlock-1) % numOfPose);
             // check gesture at start point
-            if (currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
+            if (!isEarly && currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
             {
                 Debug.Log("perfect time block: " + p + ", pose=" + ((currentBlock - 1) % 3));
                 if (p > threshold)
                 {
                     isPerfect = true;
+                    feedbackText.text = "Perfect";
                 }
             }
-            else if (currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + gracePeriod))
+            else if (!isEarly && !isPerfect && currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + lateGracePeriod))
             {
                 Debug.Log("late time block: " + p + ", pose=" + ((currentBlock - 1) % 3));
                 // late
                 if (p > threshold)
                 {
                     isLate = true;
+                    feedbackText.text = "A little bit late";
                 }
             }
-            else if (currentTime >= (startJudgeTime - gracePeriod) && currentTime < (startJudgeTime - perfectPeriod))
+            else if (currentTime >= (startJudgeTime - earlyGracePeriod) && currentTime < (startJudgeTime - perfectPeriod))
             {
 
                 Debug.Log("early time block: " + p + ", pose=" + ((currentBlock - 1) % 3));
@@ -282,11 +313,12 @@ public class GameMaster : MonoBehaviour {
                 if (p > threshold)
                 {
                     isEarly = true;
+                    feedbackText.text = "A little bit early";
                 }
             }
 
             // Display feedback
-            if (currentTime > startJudgeTime + gracePeriod)
+            if (currentTime > startJudgeTime + lateGracePeriod)
             {
                 if (!isPerfect && !isEarly && !isLate)
                 {
@@ -296,27 +328,15 @@ public class GameMaster : MonoBehaviour {
                 {
                     feedbackText.text = "Hold the gesture";
                 }
-                else if (isEarly)
-                {
-                    feedbackText.text = "Too early";
-                }
-                else if (isPerfect)
-                {
-                    feedbackText.text = "Perfect";
-                }
-                else if (isLate)
-                {
-                    feedbackText.text = "Too late";
-                }
             }
 
             // change animation
-            if (currentTime <= stopJudgeTime && currentTime >= startJudgeTime)
+            if (currentTime < stopJudgeTime && currentTime >= startJudgeTime)
             {
                 model1.GetComponent<Animator>().SetBool(model1StartAnimationTriggerName, true);
                 model2.GetComponent<Animator>().SetBool(model2StartAnimationTriggerName, true);
             }
-            else if (currentTime > stopJudgeTime)
+            else if (currentTime >= stopJudgeTime)
             {
                 model1.GetComponent<Animator>().SetBool(model1StartAnimationTriggerName, false);
                 model1.GetComponent<Animator>().SetBool(model1EndAnimationTriggerName, true);
