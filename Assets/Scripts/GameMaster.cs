@@ -44,6 +44,7 @@ public class GameMaster : MonoBehaviour {
     private GameObject model1;
     [SerializeField]
     private GameObject model2;
+    [SerializeField] GameObject visualiser;
     [SerializeField]
     private GameObject camera;
     [SerializeField]

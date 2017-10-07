@@ -33,6 +33,7 @@ public class PoseVisualiser : Singleton<PoseVisualiser> {
             if(skeleton[joint] == null) continue;
 
 
+
             skeleton[joint].rotation = Mirror(PoseProvider.instance.GetDampedQuaternion(joint));
 
 
