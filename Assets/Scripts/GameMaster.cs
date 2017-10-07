@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +28,7 @@ public class GameMaster : MonoBehaviour {
     private float nextRoundTime;
     private float waitTime = secondPerBeat * 4f;
 
-    private float perfectPeriod = 0.5f;
+    private float perfectPeriod = 0.3f;
     private float gracePeriod = 0.5f;
 
     private float moveSpeed = stageOffSet / (secondPerBeat * 3f);
@@ -254,7 +254,7 @@ public class GameMaster : MonoBehaviour {
             }
 
 
-            // float p = 0;
+
             float p = PoseEstimator.instance.Estimate((currentBlock-1) % 3 /* NOTE TO SELF: DON'T HARD CODE THIS! */);
             // check gesture at start point
             if (currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
