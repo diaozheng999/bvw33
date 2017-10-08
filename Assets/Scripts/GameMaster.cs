@@ -313,7 +313,7 @@ public class GameMaster : MonoBehaviour {
             // check gesture at start point
             if (!isEarly && currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
             {
-                Debug.Log("perfect time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
+                //Debug.Log("perfect time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
                 if (p > threshold)
                 {
                     isPerfect = true;
@@ -322,7 +322,7 @@ public class GameMaster : MonoBehaviour {
             }
             else if (!isEarly && !isPerfect && currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + lateGracePeriod))
             {
-                Debug.Log("late time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
+                //Debug.Log("late time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
                 // late
                 if (p > threshold)
                 {
@@ -333,7 +333,7 @@ public class GameMaster : MonoBehaviour {
             else if (currentTime >= (startJudgeTime - earlyGracePeriod) && currentTime < (startJudgeTime - perfectPeriod))
             {
 
-                Debug.Log("early time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
+                //Debug.Log("early time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
                 // early
                 if (p > threshold)
                 {
