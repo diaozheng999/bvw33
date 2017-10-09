@@ -116,14 +116,15 @@ public class GameMaster : MonoBehaviour {
 
     public void StartGame()
     {
-        StartCoroutine(PlayDrumSound());
+        //StartCoroutine(PlayDrumSound());
+        soundSource.Play();
         StartCoroutine(DelayedStartTime());
     }
 
 
     private IEnumerator DelayedStartTime()
     {
-        yield return new WaitForSeconds(gameDelay);
+        yield return new WaitForSeconds(16 * secondPerBeat + gameDelay);
         Destroy(startButton.gameObject);
         // readyText.text = "Ready?";
         isMoveCamera = true;
@@ -201,6 +202,7 @@ public class GameMaster : MonoBehaviour {
         model2EndAnimationTriggerName = "EndPose" + ((currentBlock) % numOfPose + 1);
     }
 
+    /* 
     private IEnumerator PlayDrumSound()
     {
         soundSource.Play();
@@ -208,7 +210,7 @@ public class GameMaster : MonoBehaviour {
         yield return new WaitForSeconds(secondPerBeat);
         soundSource.Stop();
         StartCoroutine(PlayDrumSound());
-    }
+    }*/
 
     public void EndingDelayed()
     {
