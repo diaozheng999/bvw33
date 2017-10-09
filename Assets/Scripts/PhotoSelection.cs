@@ -24,6 +24,7 @@ public class PhotoSelection : Singleton<PhotoSelection> {
     [SerializeField] Texture2D[] frames;
 
     float[] frameScores;
+    bool[] pictureTaken;
 
     int width;
     int height;
@@ -49,10 +50,15 @@ public class PhotoSelection : Singleton<PhotoSelection> {
 
         frames = new Texture2D[numFrames];
         frameScores = new float[numFrames];
+        pictureTaken = new bool[numFrames];
 
         desc = reader.ColorFrameSource.CreateFrameDescription(ColorImageFormat.Rgba);
         width = desc.Width;
         height = desc.Height;
+
+        for(int i=0; i<numFrames; ++i){
+            pictureTaken[i] = false;
+        }
 
         buffer = new byte[desc.LengthInPixels * desc.BytesPerPixel];
     }
@@ -138,6 +144,7 @@ public class PhotoSelection : Singleton<PhotoSelection> {
             if(frame!=null){
                 Debug.Log(i, frames[i]);
                 frame.CopyConvertedFrameDataToArray(buffer, ColorImageFormat.Rgba);
+                pictureTaken[i] = true;
                 frames[i].LoadRawTextureData(buffer);
                 frames[i].Apply();
             }
@@ -148,13 +155,19 @@ public class PhotoSelection : Singleton<PhotoSelection> {
         for(int j = numFrames - 1; j>i; --j){
             Graphics.CopyTexture(frames[j-1], frames[j]);
             frameScores[j] = frameScores[j-1];
+            pictureTaken[j] = pictureTaken[j-1];
         }
     }
 
     public void StopCapture(){
         beginCapture = false;
         var mat = image.material;
-        var firstImage = Random.Range(0, numFrames);
+
+
+        int firstImage;
+        do{
+            firstImage = Random.Range(0, numFrames);
+        }while(!pictureTaken[firstImage]);
         mat.mainTexture = frames[firstImage];
 
         var mat2 = image2.material;
@@ -162,7 +175,7 @@ public class PhotoSelection : Singleton<PhotoSelection> {
         int snd;
         do {
             snd = Random.Range(0, numFrames);
-        }while(snd == firstImage);
+        }while(snd == firstImage || !pictureTaken[snd]);
         
         mat2.mainTexture = frames[snd];
         image.gameObject.SetActive(true);

@@ -276,13 +276,17 @@ public class GameMaster : MonoBehaviour {
     }
 
 
-    IEnumerator EndingDelayed(){
+    void EndingDelayed(){
         fadeImageAnimator.SetBool("isFade", true);
         StarController.instance.End();
+    }
 
-        yield return new WaitForSeconds(2f);
+    public void DelayedEnding(){
+        StartCoroutine(DelayedEndingCr());
+    }
 
-        PhotoSelection.instance.StopCapture();
+    IEnumerator DelayedEndingCr(){
+         PhotoSelection.instance.StopCapture();
         if (score >= successScore)
         {
             // TODO: win!!!
@@ -294,9 +298,12 @@ public class GameMaster : MonoBehaviour {
             loseImage.SetActive(true);
         }
 
+        yield return new WaitForSeconds(3f);
+        ScreenCapture.CaptureScreenshot("Screenshot_"+System.DateTime.Now.ToString().Replace("/","_").Replace(":","_").Replace(" ", "_")+".png", 1);
     }
 
     void DropBananas () {
+        SoundManager.instance.PlayMonkeySound();
         Instantiate(bananaEmitter, camera.transform);
     }
 
@@ -331,7 +338,7 @@ public class GameMaster : MonoBehaviour {
         // game over
         if (isOver)
         {
-            StartCoroutine(EndingDelayed());
+            EndingDelayed();
             isStart = false;
             isOver = false;
         }
@@ -371,16 +378,17 @@ public class GameMaster : MonoBehaviour {
             // update model position && judge timing && calculate score
             if (currentTime >= nextRoundTime)
             {
+                /* 
                 if (!isWalk)
                 {
                     isWalk = true;
-                    model1.transform.Rotate(0, 180, 0);
-                    model2.transform.Rotate(0, 180, 0);
                     // play the walking animation
                     model1.GetComponent<Animator>().SetTrigger("StartGame");
                     model2.GetComponent<Animator>().SetTrigger("StartGame");
+                    model1.transform.Rotate(0, 180, 0);
+                    model2.transform.Rotate(0, 180, 0);
                 }
-                
+                */
 
                 if(!isPerfect && !isLate && !isEarly){
                     // missed. so judge now
