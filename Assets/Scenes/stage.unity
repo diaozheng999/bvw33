@@ -1848,6 +1848,8 @@ MonoBehaviour:
   flashParticleSystem: {fileID: 1028386764}
   soundSource: {fileID: 943116970}
   drumSound: {fileID: 8300000, guid: d7107c1bb36350f46b6d413176d91b12, type: 3}
+  bananaEmitter: {fileID: 1108682104010712, guid: 84cae7b6379b9544189e601e1387f46f,
+    type: 2}
   feedbackText: {fileID: 1634727612}
   instructionImage: {fileID: 157107210}
   readyImgae: {fileID: 0}
@@ -2371,7 +2373,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -383450989
+  randomSeed: -679006665
   InitialModule:
     serializedVersion: 3
     enabled: 1

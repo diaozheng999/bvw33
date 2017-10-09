@@ -74,6 +74,9 @@ public class GameMaster : MonoBehaviour {
     [SerializeField]
     private AudioClip drumSound;
 
+    [SerializeField]
+    GameObject bananaEmitter;
+
     private float threshold = 0.4f;
 
     private bool isStart = false;
@@ -242,6 +245,10 @@ public class GameMaster : MonoBehaviour {
             loseImage.SetActive(true);
         }
 
+    }
+
+    void DropBananas () {
+        Instantiate(bananaEmitter, camera.transform);
     }
 
     void Update () {
@@ -429,8 +436,10 @@ public class GameMaster : MonoBehaviour {
                     Debug.Log("perfect time block: " + p + ", pose=" + (poseSequence[currentPose] - 1));
                     if (p > threshold)
                     {
+                        if (!isPerfect && poseSequence[currentPose] == 2) DropBananas();
                         isPerfect = true;
                         feedbackText.text = "Perfect";
+
                     }
                 }
                 else if (!isEarly && !isPerfect && currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + lateGracePeriod))
@@ -440,8 +449,10 @@ public class GameMaster : MonoBehaviour {
                     // late
                     if (p > threshold)
                     {
+                        if (!isLate && poseSequence[currentPose] == 2) DropBananas();
                         isLate = true;
                         feedbackText.text = "A little bit late";
+
                     }
                 }
                 else if (currentTime >= (startJudgeTime - earlyGracePeriod) && currentTime < (startJudgeTime - perfectPeriod))     
@@ -451,8 +462,10 @@ public class GameMaster : MonoBehaviour {
                     // early
                     if (p > threshold)
                     {
+                        if (!isEarly && poseSequence[currentPose] == 2) DropBananas();
                         isEarly = true;
                         feedbackText.text = "A little bit early";
+
                     }
                 }
 
