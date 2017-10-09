@@ -170,23 +170,8 @@ public class GameMaster : MonoBehaviour {
         GamePreparation();
     }
 
-<<<<<<< HEAD
-
-    private IEnumerator DelayedStartTime()
-    {
-
-        // readyText.text = "Ready?";
-        readyImgae.SetActive(true);
-        var readyanim = readyImgae.GetComponent<Animator>();
-        readyanim.SetTrigger("FadeIn");
-        yield return new WaitForSeconds(waitTime);
-        readyanim.SetTrigger("FadeOut");
-
-        foreach (var countdown in countdownImages){
-=======
     IEnumerator Countdown(){
         foreach(var countdown in countdownImages){
->>>>>>> 607adb3e998dd012b9dd003f98fc5f8ab81989e0
             var anim = countdown.GetComponent<Animator>();
             countdown.SetActive(true);
             anim.SetTrigger("FadeIn");
@@ -198,9 +183,14 @@ public class GameMaster : MonoBehaviour {
 
     private IEnumerator DelayedStartTime()
     {
-        
-        // readyText.text = "Ready?";
+            // readyText.text = "Ready?";
+        readyImgae.SetActive(true);
+        var readyanim = readyImgae.GetComponent<Animator>();
+        readyanim.SetTrigger("FadeIn");
         yield return new WaitForSeconds(waitTime);
+        readyanim.SetTrigger("FadeOut");
+
+        //yield return new WaitForSeconds(waitTime);
 
         yield return StartCoroutine(Countdown());
 
@@ -519,7 +509,7 @@ public class GameMaster : MonoBehaviour {
                     Debug.Log("perfect time block: " + p + ", pose=" + (poseSequence[currentPose] - 1));
                     if (p > threshold && !isPerfect)
                     {
-                        if (poseSequence[currentPose] == 2) DropBananas();
+                        if (poseSequence[currentPose] == 4) DropBananas();
                         isPerfect = true;
                         //feedbackText.text = "Perfect";
                         StartCoroutine(FeedbackCoroutine(1));
@@ -536,7 +526,7 @@ public class GameMaster : MonoBehaviour {
                     // late
                     if (p > threshold && !isLate)
                     {
-                        if (poseSequence[currentPose] == 2) DropBananas();
+                        if (poseSequence[currentPose] == 4) DropBananas();
                         isLate = true;
                         Judge();
                         //feedbackText.text = "A little bit late";
@@ -554,7 +544,7 @@ public class GameMaster : MonoBehaviour {
                     // early
                     if (p > threshold && !isEarly)
                     {
-                        if (poseSequence[currentPose] == 2) DropBananas();
+                        if (poseSequence[currentPose] == 4) DropBananas();
                         isEarly = true;
                         Judge();
                         //feedbackText.text = "A little bit early";
