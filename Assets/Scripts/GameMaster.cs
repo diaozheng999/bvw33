@@ -76,7 +76,8 @@ public class GameMaster : MonoBehaviour {
 
     [SerializeField]
     GameObject bananaEmitter;
-
+    [SerializeField]
+    Animator[] feedbackCards;
     private float threshold = 0.4f;
 
     private bool isStart = false;
@@ -86,6 +87,7 @@ public class GameMaster : MonoBehaviour {
     private bool isPerfect = false;
     private bool isLate = false;
     private bool isPassCheckPoint = true;
+    bool isMissed = false;
 
     [SerializeField]
     private Text feedbackText;
@@ -114,6 +116,14 @@ public class GameMaster : MonoBehaviour {
     public Animator fadeImageAnimator;
     [SerializeField]
     public AnimationClip fadeImageAnimationClip;
+    [SerializeField]
+    GameObject[] curtains;
+
+    [SerializeField]
+    Animator nextClipIndicator;
+
+    [SerializeField]
+    Animator headBobGuy;
 
     private string model1StartAnimationTriggerName;
     private string model1EndAnimationTriggerName;
@@ -124,6 +134,7 @@ public class GameMaster : MonoBehaviour {
 
     bool beginScoreCapture = false;
 
+
     void Start () {
         SetTheScene(7); 
     }
@@ -132,6 +143,16 @@ public class GameMaster : MonoBehaviour {
     {
         soundSource.Play();
 		StartCoroutine(DelayedTutorial());
+        StartCoroutine(StartHeadBobbing());
+    }
+
+    IEnumerator StartHeadBobbing(){
+        yield return new WaitForSeconds(8 * secondPerBeat);
+        headBobGuy.SetTrigger("Begin");
+        yield return new WaitForSeconds(4 * secondPerBeat);
+        nextClipIndicator.SetTrigger("FadeIn");
+        yield return new WaitForSeconds(9 * secondPerBeat - 0.2f);
+        StartCoroutine(Countdown());
     }
 
     private IEnumerator DelayedTutorial()
@@ -145,13 +166,7 @@ public class GameMaster : MonoBehaviour {
         GamePreparation();
     }
 
-
-    private IEnumerator DelayedStartTime()
-    {
-        
-        // readyText.text = "Ready?";
-        yield return new WaitForSeconds(waitTime);
-
+    IEnumerator Countdown(){
         foreach(var countdown in countdownImages){
             var anim = countdown.GetComponent<Animator>();
             countdown.SetActive(true);
@@ -159,6 +174,16 @@ public class GameMaster : MonoBehaviour {
             yield return new WaitForSeconds(secondPerBeat);
             anim.SetTrigger("FadeOut");
         }
+    }
+
+
+    private IEnumerator DelayedStartTime()
+    {
+        
+        // readyText.text = "Ready?";
+        yield return new WaitForSeconds(waitTime);
+
+        yield return StartCoroutine(Countdown());
 
 
         hereWeGoImgae.SetActive(true);
@@ -170,6 +195,14 @@ public class GameMaster : MonoBehaviour {
 
         beginScoreCapture = true;
         StarController.instance.Begin();
+
+        // open curtains
+        
+        foreach(var curtain in curtains){
+            var s = curtain.transform.localScale;
+            s.x = 1f;
+            curtain.transform.localScale = s;
+        }
 
         yield return new WaitForSeconds(1);
         foreach(var countdown in countdownImages){
@@ -226,6 +259,12 @@ public class GameMaster : MonoBehaviour {
         StartCoroutine(PlayDrumSound());
     }*/
 
+    IEnumerator FeedbackCoroutine(int id){
+        feedbackCards[id].SetTrigger("FadeIn");
+        yield return new WaitForSeconds(2f);
+        feedbackCards[id].SetTrigger("FadeOut");
+    }
+
 
     IEnumerator EndingDelayed(){
         fadeImageAnimator.SetBool("isFade", true);
@@ -249,6 +288,33 @@ public class GameMaster : MonoBehaviour {
 
     void DropBananas () {
         Instantiate(bananaEmitter, camera.transform);
+    }
+
+    void Judge(){
+        var sc = 0f;
+
+        if (currentBlock > 0)
+        {
+            if (isPerfect)
+            {
+                score += scoreForEachPose;
+                sc = 1f;
+            }
+            else if (isEarly || isLate)
+            {
+                score += scoreForEachPose * 0.6f;
+                sc = 0.6f;
+            }
+        }
+
+        if (beginScoreCapture) {
+
+            Debug.Log(currentPose);
+            averageScore = ((averageScore * countableValues) + sc ) / (countableValues+1);
+            Debug.Log(averageScore);
+            countableValues += 1;
+        }
+        StarController.instance.SetScore(averageScore);
     }
 
     void Update () {
@@ -293,35 +359,16 @@ public class GameMaster : MonoBehaviour {
                 model1.GetComponent<Animator>().SetTrigger("StartGame");
                 model2.GetComponent<Animator>().SetTrigger("StartGame");
 
-                var sc = 0f;
-
-                if (currentBlock > 0)
-                {
-                    if (isPerfect)
-                    {
-                        score += scoreForEachPose;
-                        sc = 1f;
-                    }
-                    else if (isEarly || isLate)
-                    {
-                        score += scoreForEachPose * 0.6f;
-                        sc = 0.6f;
-                    }
+                if(!isPerfect && !isLate && !isEarly){
+                    // missed. so judge now
+                    Judge();
                 }
-
-                if (beginScoreCapture) {
-
-                    Debug.Log(currentPose);
-                    averageScore = ((averageScore * countableValues) + sc ) / (countableValues+1);
-                    Debug.Log(averageScore);
-                    countableValues += 1;
-                }
-                StarController.instance.SetScore(averageScore);
 
                 feedbackText.text = "";
                 isPerfect = false;
                 isEarly = false;
                 isLate = false;
+                isMissed = false;
                 isPassCheckPoint = true;
                 Debug.Log("reset bool");
 
@@ -434,12 +481,13 @@ public class GameMaster : MonoBehaviour {
 
                 {
                     Debug.Log("perfect time block: " + p + ", pose=" + (poseSequence[currentPose] - 1));
-                    if (p > threshold)
+                    if (p > threshold && !isPerfect)
                     {
-                        if (!isPerfect && poseSequence[currentPose] == 2) DropBananas();
+                        if (poseSequence[currentPose] == 2) DropBananas();
                         isPerfect = true;
-                        feedbackText.text = "Perfect";
-
+                        //feedbackText.text = "Perfect";
+                        StartCoroutine(FeedbackCoroutine(1));
+                        Judge();
                     }
                 }
                 else if (!isEarly && !isPerfect && currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + lateGracePeriod))
@@ -447,11 +495,13 @@ public class GameMaster : MonoBehaviour {
                 {
                     Debug.Log("late time block: " + p + ", pose=" + (poseSequence[currentPose] - 1));
                     // late
-                    if (p > threshold)
+                    if (p > threshold && !isLate)
                     {
-                        if (!isLate && poseSequence[currentPose] == 2) DropBananas();
+                        if (poseSequence[currentPose] == 2) DropBananas();
                         isLate = true;
-                        feedbackText.text = "A little bit late";
+                        Judge();
+                        //feedbackText.text = "A little bit late";
+                        StartCoroutine(FeedbackCoroutine(0));
 
                     }
                 }
@@ -460,27 +510,33 @@ public class GameMaster : MonoBehaviour {
 
                     Debug.Log("early time block: " + p + ", pose=" + (poseSequence[currentPose] - 1));
                     // early
-                    if (p > threshold)
+                    if (p > threshold && !isEarly)
                     {
-                        if (!isEarly && poseSequence[currentPose] == 2) DropBananas();
+                        if (poseSequence[currentPose] == 2) DropBananas();
                         isEarly = true;
-                        feedbackText.text = "A little bit early";
-
+                        Judge();
+                        //feedbackText.text = "A little bit early";
+                        StartCoroutine(FeedbackCoroutine(0));
                     }
                 }
 
                 // Display feedback
+                
                 if (currentTime > startJudgeTime + lateGracePeriod)
                 {
                     if (!isPerfect && !isEarly && !isLate)
                     {
-                        feedbackText.text = "Miss";
+                        if(!isMissed) {
+                            isMissed = true;
+                            StartCoroutine(FeedbackCoroutine(2));
+                        }
                     }
                     else if (!isPassCheckPoint)
                     {
                         feedbackText.text = "Hold the gesture"; // TODO: NOT IMPLEMENTED YET!!!
                     }
                 }
+                
             }
             
 
