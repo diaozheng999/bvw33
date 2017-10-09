@@ -25,6 +25,7 @@ public class StarController : Singleton<StarController> {
     public void SetScore(float value){
         targetf = value;
         target = Mathf.FloorToInt(value * (background.Length+1));
+        Debug.Log("New Score:" + target);
         if(begun) this.StartCoroutine1(Adjust());
     }
 
@@ -46,7 +47,9 @@ public class StarController : Singleton<StarController> {
             if(currentValue < target){
                 foreground[currentValue++].SetTrigger("FadeIn");
             }else if(currentValue > target){
-                foreground[--currentValue].SetTrigger("FadeOut");
+                var p = --currentValue;
+                if (p>=0)
+                    foreground[p].SetTrigger("FadeOut");
             }
             yield return delay;
         }
@@ -60,6 +63,15 @@ public class StarController : Singleton<StarController> {
         }
         yield return this.StartCoroutine1(Adjust()).GetAwaiter();
         begun = true;
+    }
+
+    public void End(){
+        foreach(var anim in background){
+            anim.SetTrigger("FadeOut");
+        }
+        foreach(var anim in foreground){
+            anim.SetTrigger("FadeOut");
+        }
     }
 
     void Update(){

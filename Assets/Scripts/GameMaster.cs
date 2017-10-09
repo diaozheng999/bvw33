@@ -52,6 +52,8 @@ public class GameMaster : MonoBehaviour {
     private int[] poseSequence = new int[] { 1, 2, 3, /* <-tutorial*/0, 1, 2, 3, 1, 1, 2, 3, 2, 1, 1, 1, 1, 1, 1, 1 };
 
     private float score = 0;
+    float averageScore = 0f;
+    float countableValues = 0f;
     private float scoreForEachPose = 100f / (numOfBlockStage - 1);
     private float successScore = 60f;
 
@@ -117,6 +119,8 @@ public class GameMaster : MonoBehaviour {
 
     bool freestyle = false;
 
+    bool beginScoreCapture = false;
+
     void Start () {
         SetTheScene(7); 
     }
@@ -160,6 +164,9 @@ public class GameMaster : MonoBehaviour {
         yield return new WaitForSeconds(secondPerBeat);
         hwganim.SetTrigger("FadeOut");
         flashParticleSystem.Play();
+
+        beginScoreCapture = true;
+        StarController.instance.Begin();
 
         yield return new WaitForSeconds(1);
         foreach(var countdown in countdownImages){
@@ -219,6 +226,7 @@ public class GameMaster : MonoBehaviour {
 
     IEnumerator EndingDelayed(){
         fadeImageAnimator.SetBool("isFade", true);
+        StarController.instance.End();
 
         yield return new WaitForSeconds(2f);
 
@@ -278,19 +286,30 @@ public class GameMaster : MonoBehaviour {
                 model1.GetComponent<Animator>().SetTrigger("StartGame");
                 model2.GetComponent<Animator>().SetTrigger("StartGame");
 
-                
+                var sc = 0f;
 
                 if (currentBlock > 0)
                 {
                     if (isPerfect)
                     {
                         score += scoreForEachPose;
+                        sc = 1f;
                     }
                     else if (isEarly || isLate)
                     {
                         score += scoreForEachPose * 0.6f;
+                        sc = 0.6f;
                     }
                 }
+
+                if (beginScoreCapture) {
+
+                    Debug.Log(currentPose);
+                    averageScore = ((averageScore * countableValues) + sc ) / (countableValues+1);
+                    Debug.Log(averageScore);
+                    countableValues += 1;
+                }
+                StarController.instance.SetScore(averageScore);
 
                 feedbackText.text = "";
                 isPerfect = false;
