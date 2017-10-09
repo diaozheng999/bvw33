@@ -67,7 +67,6 @@ public class DepthProvider : Disposable {
 			
 			frame?.CopyFrameDataToArray(buffer);
 			var len = buffer.Length;
-			float usm = ushort.MaxValue;
 
 
 			for(int i=0; i<len; ++i){

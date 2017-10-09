@@ -127,9 +127,13 @@ public class PoseProvider : Singleton<PoseProvider> {
 		});
 	}
 
-	public Vector3 GetRelativePos(KinectSkeleton b, JointType j){
-		return b[j].transform.position - b[JointType.SpineMid].transform.position;
-	}
+	public Sequence<Quaternion> GetPoseValues(Body body) =>
+		Sequence.Tabulate(25, (int i) => 
+			ToQuaternion(body.JointOrientations[(JointType)i]));
+	
+
+	public Vector3 GetRelativePos(KinectSkeleton b, JointType j) =>
+		b[j].transform.position - b[JointType.SpineMid].transform.position;
 
 	public Vector3 GetRelativePos(Body b, JointType j){
 		var parent = KinectSkeleton.GetParent(j).Value();
@@ -138,15 +142,12 @@ public class PoseProvider : Singleton<PoseProvider> {
 		return dir.normalized;
 	}
 
-	public Vector3 ToVector3(Windows.Kinect.Joint j){
-		return new Vector3(j.Position.X, j.Position.Y, j.Position.Z);
-	}
+	public Vector3 ToVector3(Windows.Kinect.Joint j) =>
+		new Vector3(j.Position.X, j.Position.Y, j.Position.Z);
+	
 
-	public Quaternion ToQuaternion(JointOrientation j){
-		return new Quaternion(j.Orientation.X, j.Orientation.Y, j.Orientation.Z, j.Orientation.W);
-	}
+	public Quaternion ToQuaternion(JointOrientation j) =>
+		new Quaternion(j.Orientation.X, j.Orientation.Y, j.Orientation.Z, j.Orientation.W);
 
-	public Quaternion GetDampedQuaternion(JointType joint){
-		return dampers[(int)joint].Value();
-	}
+	public Quaternion GetDampedQuaternion(JointType joint) => dampers[(int)joint].Value();
 }

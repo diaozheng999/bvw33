@@ -74,7 +74,6 @@ public class GameMaster : MonoBehaviour {
 
     private float threshold = 0.4f;
 
-    private bool isMoveCamera = false;
     private bool isStart = false;
     private bool isOver = false;
 
@@ -90,7 +89,7 @@ public class GameMaster : MonoBehaviour {
     [SerializeField]
     private GameObject readyImgae;
     [SerializeField]
-    private GameObject countdownImage;
+    private GameObject[] countdownImages;
     [SerializeField]
     private Texture countdown2Texture;
     [SerializeField]
@@ -116,20 +115,22 @@ public class GameMaster : MonoBehaviour {
     private string model2StartAnimationTriggerName;
     private string model2EndAnimationTriggerName;
 
+    bool freestyle = false;
+
     void Start () {
         SetTheScene(7); 
     }
 
     public void StartGame()
     {
-        StartCoroutine(PlayDrumSound());
-        StartCoroutine(DelayedTutorial());
+        soundSource.Play();
+		StartCoroutine(DelayedTutorial());
     }
 
     private IEnumerator DelayedTutorial()
     {
-        yield return new WaitForSeconds(gameDelay);
         Destroy(startButton.gameObject);
+        yield return new WaitForSeconds(gameDelay);
         isStart = true;
         startTime = Time.time;
         nextGenerateTime = startTime + prepareTime + tutorialTime + countdownTime + generateWaitTime;
@@ -142,19 +143,29 @@ public class GameMaster : MonoBehaviour {
     {
         
         // readyText.text = "Ready?";
-        isMoveCamera = true;
         yield return new WaitForSeconds(waitTime);
-        countdownImage.SetActive(true);
-        yield return new WaitForSeconds(secondPerBeat);
-        countdownImage.GetComponent<RawImage>().texture = countdown2Texture;
-        yield return new WaitForSeconds(secondPerBeat);
-        countdownImage.GetComponent<RawImage>().texture = countdown1Texture;
-        yield return new WaitForSeconds(secondPerBeat);
-        countdownImage.SetActive(false);
+
+        foreach(var countdown in countdownImages){
+            var anim = countdown.GetComponent<Animator>();
+            countdown.SetActive(true);
+            anim.SetTrigger("FadeIn");
+            yield return new WaitForSeconds(secondPerBeat);
+            anim.SetTrigger("FadeOut");
+        }
+
+
         hereWeGoImgae.SetActive(true);
+        var hwganim = hereWeGoImgae.GetComponent<Animator>();
+        hwganim.SetTrigger("FadeIn");
         yield return new WaitForSeconds(secondPerBeat);
-        hereWeGoImgae.SetActive(false);
+        hwganim.SetTrigger("FadeOut");
         flashParticleSystem.Play();
+
+        yield return new WaitForSeconds(1);
+        foreach(var countdown in countdownImages){
+            countdown.SetActive(false);
+        }
+        hereWeGoImgae.SetActive(false);
     }
        
 
@@ -196,17 +207,20 @@ public class GameMaster : MonoBehaviour {
         model2EndAnimationTriggerName = "EndPose" + (poseSequence[currentPose + 1]);
     }
 
+    /* 
     private IEnumerator PlayDrumSound()
     {
         soundSource.Play();
         yield return new WaitForSeconds(secondPerBeat);
         soundSource.Stop();
         StartCoroutine(PlayDrumSound());
-    }
+    }*/
 
     public void EndingDelayed()
     {
         fadeImageAnimator.SetBool("isFade", false);
+        PhotoSelection.instance.StopCapture();
+
         if (score >= successScore)
         {
             // TODO: win!!!
@@ -219,24 +233,12 @@ public class GameMaster : MonoBehaviour {
     }
 
     void Update () {
-        // move the camera in the beginning
-        if (isMoveCamera)
-        {
-            Debug.Log("MOVE CAMERA");
-            float step = 0.55f / (secondPerBeat * 3) * Time.deltaTime;
-            camera.transform.position = Vector3.MoveTowards(camera.transform.position, model1.transform.position, step);
-            if (camera.transform.position == model1.transform.position)
-            {
-                isMoveCamera = false;
-                nextCameraPosition = nextModel1Position;
-            }
-        }  
         // game over
         if (isOver)
         {
             Invoke("EndingDelayed", fadeImageAnimationClip.length);
             fadeImageAnimator.SetBool("isFade", true);
-            isMoveCamera = false;
+
             isStart = false;
             isOver = false;
         }
@@ -401,6 +403,7 @@ public class GameMaster : MonoBehaviour {
                 // float p = PoseEstimator.instance.Estimate(poseSequence[currentPose] - 1);
                 // check gesture at start point
                 if (!isEarly && currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
+
                 {
                     Debug.Log("perfect time block: " + p + ", pose=" + (poseSequence[currentPose] - 1));
                     if (p > threshold)
@@ -410,6 +413,7 @@ public class GameMaster : MonoBehaviour {
                     }
                 }
                 else if (!isEarly && !isPerfect && currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + lateGracePeriod))
+
                 {
                     Debug.Log("late time block: " + p + ", pose=" + (poseSequence[currentPose] - 1));
                     // late
@@ -419,7 +423,7 @@ public class GameMaster : MonoBehaviour {
                         feedbackText.text = "A little bit late";
                     }
                 }
-                else if (currentTime >= (startJudgeTime - earlyGracePeriod) && currentTime < (startJudgeTime - perfectPeriod))
+                else if (currentTime >= (startJudgeTime - earlyGracePeriod) && currentTime < (startJudgeTime - perfectPeriod))     
                 {
 
                     Debug.Log("early time block: " + p + ", pose=" + (poseSequence[currentPose] - 1));
@@ -476,8 +480,10 @@ public class GameMaster : MonoBehaviour {
             }
 
             // taking picture for player
-            if (currentTime > pictureTime)
+            if (currentTime > pictureTime && !freestyle)
             {
+                freestyle = true;
+                PhotoSelection.instance.BeginCapture();
                 // TODO: Take picture here!!!
                 pictureTime += waitTime;
             }
