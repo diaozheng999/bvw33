@@ -134,6 +134,7 @@ public class GameMaster : MonoBehaviour {
 
     bool beginScoreCapture = false;
 
+    int nMisses = 0;
 
     void Start () {
         SetTheScene(7); 
@@ -197,7 +198,7 @@ public class GameMaster : MonoBehaviour {
         StarController.instance.Begin();
 
         // open curtains
-        
+
         foreach(var curtain in curtains){
             var s = curtain.transform.localScale;
             s.x = 1f;
@@ -488,6 +489,9 @@ public class GameMaster : MonoBehaviour {
                         //feedbackText.text = "Perfect";
                         StartCoroutine(FeedbackCoroutine(1));
                         Judge();
+                        if(beginScoreCapture)
+                            SoundManager.instance.PlayExcellentSoundscape();
+                        nMisses = 0;
                     }
                 }
                 else if (!isEarly && !isPerfect && currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + lateGracePeriod))
@@ -502,6 +506,9 @@ public class GameMaster : MonoBehaviour {
                         Judge();
                         //feedbackText.text = "A little bit late";
                         StartCoroutine(FeedbackCoroutine(0));
+                        if(beginScoreCapture)
+                            SoundManager.instance.PlayGoodSoundscape();
+                        nMisses = 0;
 
                     }
                 }
@@ -517,6 +524,9 @@ public class GameMaster : MonoBehaviour {
                         Judge();
                         //feedbackText.text = "A little bit early";
                         StartCoroutine(FeedbackCoroutine(0));
+                        if(beginScoreCapture)
+                            SoundManager.instance.PlayGoodSoundscape();
+                        nMisses = 0;
                     }
                 }
 
@@ -529,6 +539,12 @@ public class GameMaster : MonoBehaviour {
                         if(!isMissed) {
                             isMissed = true;
                             StartCoroutine(FeedbackCoroutine(2));
+                            if(beginScoreCapture){
+                                nMisses++;
+                                if(nMisses >= 4){
+                                    SoundManager.instance.PlayBoo();
+                                }
+                            }
                         }
                     }
                     else if (!isPassCheckPoint)

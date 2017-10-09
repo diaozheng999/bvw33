@@ -119,6 +119,7 @@ public class PhotoSelection : Singleton<PhotoSelection> {
                 //set frame
                 SetFrame(i);
                 frameScores[i] = score;
+                SoundManager.instance.PlayFlashOnce();
                 StartCoroutine(Timeout());
                 break;
             }
