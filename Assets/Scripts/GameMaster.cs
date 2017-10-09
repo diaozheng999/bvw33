@@ -82,7 +82,7 @@ public class GameMaster : MonoBehaviour {
     [SerializeField]
     private GameObject readyImgae;
     [SerializeField]
-    private GameObject countdownImage;
+    private GameObject[] countdownImages;
     [SerializeField]
     private Texture countdown2Texture;
     [SerializeField]
@@ -108,43 +108,56 @@ public class GameMaster : MonoBehaviour {
     private string model2StartAnimationTriggerName;
     private string model2EndAnimationTriggerName;
 
+    bool freestyle = false;
+
     void Start () {
         SetTheScene(7); 
     }
 
     public void StartGame()
     {
-        StartCoroutine(PlayDrumSound());
+        //StartCoroutine(PlayDrumSound());
+        soundSource.Play();
         StartCoroutine(DelayedStartTime());
     }
 
 
     private IEnumerator DelayedStartTime()
     {
-        yield return new WaitForSeconds(gameDelay);
+        yield return new WaitForSeconds(16 * secondPerBeat + gameDelay);
         Destroy(startButton.gameObject);
         // readyText.text = "Ready?";
         isMoveCamera = true;
         yield return new WaitForSeconds(waitTime);
-        countdownImage.SetActive(true);
-        yield return new WaitForSeconds(secondPerBeat);
-        countdownImage.GetComponent<RawImage>().texture = countdown2Texture;
-        yield return new WaitForSeconds(secondPerBeat);
-        countdownImage.GetComponent<RawImage>().texture = countdown1Texture;
-        yield return new WaitForSeconds(secondPerBeat);
-        countdownImage.SetActive(false);
+
+        foreach(var countdown in countdownImages){
+            var anim = countdown.GetComponent<Animator>();
+            countdown.SetActive(true);
+            anim.SetTrigger("FadeIn");
+            yield return new WaitForSeconds(secondPerBeat);
+            anim.SetTrigger("FadeOut");
+        }
+
+
         hereWeGoImgae.SetActive(true);
+        var hwganim = hereWeGoImgae.GetComponent<Animator>();
+        hwganim.SetTrigger("FadeIn");
         yield return new WaitForSeconds(secondPerBeat);
-        hereWeGoImgae.SetActive(false);
+        hwganim.SetTrigger("FadeOut");
         flashParticleSystem.Play();
         isStart = true;
         startTime = Time.time;
         nextGenerateTime = startTime + generateWaitTime;
+
         
         SetThePlayer();
         SetTheInstruction();
         SetPoseAnimation();
-        
+        yield return new WaitForSeconds(1);
+        foreach(var countdown in countdownImages){
+            countdown.SetActive(false);
+        }
+        hereWeGoImgae.SetActive(false);
     }
        
 
@@ -189,6 +202,7 @@ public class GameMaster : MonoBehaviour {
         model2EndAnimationTriggerName = "EndPose" + ((currentBlock) % numOfPose + 1);
     }
 
+    /* 
     private IEnumerator PlayDrumSound()
     {
         soundSource.Play();
@@ -196,11 +210,13 @@ public class GameMaster : MonoBehaviour {
         yield return new WaitForSeconds(secondPerBeat);
         soundSource.Stop();
         StartCoroutine(PlayDrumSound());
-    }
+    }*/
 
     public void EndingDelayed()
     {
         fadeImageAnimator.SetBool("isFade", false);
+        PhotoSelection.instance.StopCapture();
+
         if (score >= successScore)
         {
             // TODO: win!!!
@@ -385,12 +401,12 @@ public class GameMaster : MonoBehaviour {
                 model2.GetComponent<Animator>().SetTrigger("TurnRight");
             }
 
-            float p = 0;
-            // float p = PoseEstimator.instance.Estimate((currentBlock-1) % numOfPose);
+            //float p = 0;
+            float p = PoseEstimator.instance.Estimate((currentBlock-1) % numOfPose);
             // check gesture at start point
             if (!isEarly && currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
             {
-                Debug.Log("perfect time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
+                //Debug.Log("perfect time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
                 if (p > threshold)
                 {
                     isPerfect = true;
@@ -399,7 +415,7 @@ public class GameMaster : MonoBehaviour {
             }
             else if (!isEarly && !isPerfect && currentTime > (startJudgeTime + perfectPeriod) && currentTime <= (startJudgeTime + lateGracePeriod))
             {
-                Debug.Log("late time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
+                //Debug.Log("late time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
                 // late
                 if (p > threshold)
                 {
@@ -410,7 +426,7 @@ public class GameMaster : MonoBehaviour {
             else if (currentTime >= (startJudgeTime - earlyGracePeriod) && currentTime < (startJudgeTime - perfectPeriod))
             {
 
-                Debug.Log("early time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
+                //Debug.Log("early time block: " + p + ", pose=" + ((currentBlock - 1) % numOfPose));
                 // early
                 if (p > threshold)
                 {
@@ -472,8 +488,10 @@ public class GameMaster : MonoBehaviour {
             }*/
 
             // taking picture for player
-            if (currentTime > pictureTime)
+            if (currentTime > pictureTime && !freestyle)
             {
+                freestyle = true;
+                PhotoSelection.instance.BeginCapture();
                 // TODO: Take picture here!!!
                 pictureTime += waitTime;
             }

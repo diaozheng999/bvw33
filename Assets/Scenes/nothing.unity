@@ -184,7 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c2128f26cbf5f47b96216b249e8629, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poseId: 3
+  poseId: 5
   poseRenderer: {fileID: 282893848}
 --- !u!23 &282893848
 MeshRenderer:
@@ -488,6 +488,11 @@ Prefab:
       propertyPath: filename
       value: log_pose5_2.csv
       objectReference: {fileID: 0}
+    - target: {fileID: 114709584480085900, guid: eb03bc5910dd2534cbc6689320b531c3,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: eb03bc5910dd2534cbc6689320b531c3, type: 2}
   m_IsPrefabParent: 0
@@ -501,7 +506,7 @@ Prefab:
     - target: {fileID: 114854617085901128, guid: 6456685fbc766814096c27c6f2dae052,
         type: 2}
       propertyPath: poses.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4048629878419478, guid: 6456685fbc766814096c27c6f2dae052, type: 2}
       propertyPath: m_LocalPosition.x
@@ -549,6 +554,11 @@ Prefab:
         type: 2}
       propertyPath: poses.Array.data[4]
       value: pose5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114854617085901128, guid: 6456685fbc766814096c27c6f2dae052,
+        type: 2}
+      propertyPath: poses.Array.data[5]
+      value: idle
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6456685fbc766814096c27c6f2dae052, type: 2}
