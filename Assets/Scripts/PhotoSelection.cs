@@ -18,20 +18,23 @@ public class PhotoSelection : Singleton<PhotoSelection> {
 
     [SerializeField] bool beginCapture;
 
-    [SerializeField] Image[] debug;
+    [SerializeField] Image image;
+    [SerializeField] Image image2;
 
     [SerializeField] Texture2D[] frames;
 
     float[] frameScores;
-
-    Sequence<Quaternion> previousOrientation;
 
     int width;
     int height;
 
     byte[] buffer;
 
+    Sequence<Quaternion> previousPose;
+
     FrameDescription desc;
+
+    bool timeOut = false;
 
     void Start() {
         sensor = KinectSensor.GetDefault();
@@ -52,13 +55,8 @@ public class PhotoSelection : Singleton<PhotoSelection> {
         height = desc.Height;
 
         buffer = new byte[desc.LengthInPixels * desc.BytesPerPixel];
-        StartCoroutine(beginc());
     }
 
-    IEnumerator beginc(){
-        yield return new WaitForSeconds(6f);
-        BeginCapture();
-    }
 
 
     bool JointFilter(int i) {
@@ -87,12 +85,12 @@ public class PhotoSelection : Singleton<PhotoSelection> {
             Debug.LogError("No one is being tracked right now.");
             return;
         }
-        previousOrientation = PoseProvider.instance.GetPoseValues(_body.Value()).FilterIndex(JointFilter);
+
+        previousPose = PoseProvider.instance.GetPoseValues(_body.Value()).FilterIndex(JointFilter);
 
         for(int i=0; i<numFrames; ++i){
             frames[i] = new Texture2D(width, height, TextureFormat.RGBA32, false);
-            var tex = debug[i].material;
-            tex.mainTexture = frames[i];
+            frameScores[i] = float.PositiveInfinity;
         }
 
         beginCapture = true;
@@ -101,28 +99,36 @@ public class PhotoSelection : Singleton<PhotoSelection> {
 
     void FixedUpdate () {
         if(!beginCapture) return;
+        if(timeOut) return;
 
         var _body = PoseProvider.instance.GetCurrentTrackedBody();
         if(_body.IsNone()) return;
 
-        var nextOrientation = PoseProvider.instance.GetPoseValues(_body.Value()).FilterIndex(JointFilter);
+        var pose = PoseProvider.instance.GetPoseValues(_body.Value()).FilterIndex(JointFilter);
 
-        var score = previousOrientation.MapWith(nextOrientation, Quaternion.Angle).Reduce(Function.fadd, 0f);
+        var movement = pose.MapWith(previousPose, Quaternion.Angle).Reduce(Function.fadd, 0);
 
+        previousPose = pose;
+        if(movement > 30) return;   
 
-        Debug.Log(score);
+        var score = PoseEstimator.instance.Estimate(4);
 
         for(int i=0; i<numFrames; ++i){
-            if(score > frameScores[i]){
+            if(score <= frameScores[i]){
                 BubbleTextures(i);
                 //set frame
                 SetFrame(i);
                 frameScores[i] = score;
+                StartCoroutine(Timeout());
                 break;
             }
         }
+    }
 
-        previousOrientation = nextOrientation;
+    IEnumerator Timeout(){
+        timeOut = true;
+        yield return new WaitForSeconds(0.3f);
+        timeOut = false;
     }
 
     void SetFrame(int i){
@@ -142,6 +148,24 @@ public class PhotoSelection : Singleton<PhotoSelection> {
             Graphics.CopyTexture(frames[j-1], frames[j]);
             frameScores[j] = frameScores[j-1];
         }
+    }
+
+    public void StopCapture(){
+        beginCapture = false;
+        var mat = image.material;
+        var firstImage = Random.Range(0, numFrames);
+        mat.mainTexture = frames[firstImage];
+
+        var mat2 = image2.material;
+
+        int snd;
+        do {
+            snd = Random.Range(0, numFrames);
+        }while(snd == firstImage);
+        
+        mat2.mainTexture = frames[snd];
+        image.gameObject.SetActive(true);
+        image2.gameObject.SetActive(true);
     }
 
 }

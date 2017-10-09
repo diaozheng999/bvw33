@@ -28,6 +28,8 @@ public class GameMaster : MonoBehaviour {
     private float nextRoundTime;
     private float waitTime = secondPerBeat * 4f;
 
+    private float pictureTime = float.MaxValue;
+
     private float perfectPeriod = 0.5f; // 1s in total
     private float earlyGracePeriod = 0.6f;
     private float lateGracePeriod = 0.8f;
@@ -36,10 +38,14 @@ public class GameMaster : MonoBehaviour {
 
     private int currentBlock = 0;
     private int numOfGeneratedBlock = 0;
-    private int numOfBlockStage = 9; /* total number of poses is numOfBlockStage - 1 */
+    private static int numOfBlockStage = 9; /* total number of poses is numOfBlockStage - 1 */
     private int numOfPoseOnRoundStage = 4;
 
     private int numOfPose = 3;
+
+    private float score = 0;
+    private float scoreForEachPose = 100f / (numOfBlockStage - 1);
+    private float successScore = 60f;
 
     [SerializeField]
     private GameObject stageGenerator;
@@ -51,6 +57,8 @@ public class GameMaster : MonoBehaviour {
     private GameObject visualiser;
     [SerializeField]
     private GameObject camera;
+    [SerializeField]
+    private ParticleSystem flashParticleSystem;
     [SerializeField]
     private AudioSource soundSource;
     [SerializeField]
@@ -72,15 +80,35 @@ public class GameMaster : MonoBehaviour {
     [SerializeField]
     private Image instructionImage;
     [SerializeField]
-    private Text readyText;
+    private GameObject readyImgae;
+    [SerializeField]
+    private GameObject[] countdownImages;
+    [SerializeField]
+    private Texture countdown2Texture;
+    [SerializeField]
+    private Texture countdown1Texture;
+    [SerializeField]
+    private GameObject hereWeGoImgae;
     [SerializeField]
     private Button startButton;
     public Sprite[] instructions;
+    [SerializeField]
+    private GameObject freeSytleImage;
+    [SerializeField]
+    private GameObject winImage;
+    [SerializeField]
+    private GameObject loseImage;
+    [SerializeField]
+    public Animator fadeImageAnimator;
+    [SerializeField]
+    public AnimationClip fadeImageAnimationClip;
 
     private string model1StartAnimationTriggerName;
     private string model1EndAnimationTriggerName;
     private string model2StartAnimationTriggerName;
     private string model2EndAnimationTriggerName;
+
+    bool freestyle = false;
 
     void Start () {
         SetTheScene(7); 
@@ -97,26 +125,38 @@ public class GameMaster : MonoBehaviour {
     {
         yield return new WaitForSeconds(gameDelay);
         Destroy(startButton.gameObject);
-        readyText.text = "Ready?";
+        // readyText.text = "Ready?";
         isMoveCamera = true;
         yield return new WaitForSeconds(waitTime);
-        readyText.text = "3";
+
+        foreach(var countdown in countdownImages){
+            var anim = countdown.GetComponent<Animator>();
+            countdown.SetActive(true);
+            anim.SetTrigger("FadeIn");
+            yield return new WaitForSeconds(secondPerBeat);
+            anim.SetTrigger("FadeOut");
+        }
+
+
+        hereWeGoImgae.SetActive(true);
+        var hwganim = hereWeGoImgae.GetComponent<Animator>();
+        hwganim.SetTrigger("FadeIn");
         yield return new WaitForSeconds(secondPerBeat);
-        readyText.text = "2";
-        yield return new WaitForSeconds(secondPerBeat);
-        readyText.text = "1";
-        yield return new WaitForSeconds(secondPerBeat);
-        readyText.text = "Go";
-        yield return new WaitForSeconds(secondPerBeat);
-        readyText.text = "";
+        hwganim.SetTrigger("FadeOut");
+        flashParticleSystem.Play();
         isStart = true;
         startTime = Time.time;
         nextGenerateTime = startTime + generateWaitTime;
+
         
         SetThePlayer();
         SetTheInstruction();
         SetPoseAnimation();
-        
+        yield return new WaitForSeconds(1);
+        foreach(var countdown in countdownImages){
+            countdown.SetActive(false);
+        }
+        hereWeGoImgae.SetActive(false);
     }
        
 
@@ -170,12 +210,38 @@ public class GameMaster : MonoBehaviour {
         StartCoroutine(PlayDrumSound());
     }
 
+    public void EndingDelayed()
+    {
+        fadeImageAnimator.SetBool("isFade", false);
+        PhotoSelection.instance.StopCapture();
+
+        if (score >= successScore)
+        {
+            // TODO: win!!!
+        }
+        else
+        {
+            // TODO: lose!!!
+            loseImage.SetActive(true);
+        }
+    }
+
     void Update () {
+        // move the camera in the beginning
         if (!isStart && isMoveCamera)
         {
             float step = 0.5f / (secondPerBeat * 3) * Time.deltaTime;
             camera.transform.position = Vector3.MoveTowards(camera.transform.position, model1.transform.position, step);
         }  
+        // game over
+        if (isOver)
+        {
+            Invoke("EndingDelayed", fadeImageAnimationClip.length);
+            fadeImageAnimator.SetBool("isFade", true);
+            isMoveCamera = false;
+            isStart = false;
+            isOver = false;
+        }
 
         if (isStart)
         {
@@ -234,9 +300,24 @@ public class GameMaster : MonoBehaviour {
             }
             */
 
-            // update model position && judge timing
+            // update model position && judge timing && calculate score
             if (currentTime >= nextRoundTime)
             {
+                if (isPerfect)
+                {
+                    score += scoreForEachPose;
+                }
+                else if (isEarly || isLate)
+                {
+                    score += scoreForEachPose * 0.6f;
+                }
+                feedbackText.text = "";
+                isPerfect = false;
+                isEarly = false;
+                isLate = false;
+                isPassCheckPoint = true;
+                Debug.Log("reset bool");
+
                 if (currentBlock < (numOfBlockStage - 1))
                 {
                     // update judge time (judge every 8 beats)
@@ -251,33 +332,43 @@ public class GameMaster : MonoBehaviour {
                 else if (currentBlock == (numOfBlockStage - 1))
                 {
                     // update judge time (judge in 12 beats)
-                    startJudgeTime += (waitTime * 3f);
-                    stopJudgeTime += (waitTime * 3f);
+                    // startJudgeTime += (waitTime * 3f);
+                    // stopJudgeTime += (waitTime * 3f);
                     // update model1 position
                     nextCameraPosition.z += (stageOffSet * 2f);
                     nextModel2Position.z += (stageOffSet * 2f);
                     currentBlock++;
-                    nextRoundTime += waitTime * 3f;
+                    nextRoundTime += waitTime * 2f;
+                    pictureTime = nextRoundTime + secondPerBeat * 2f;
                 }
-                else if (currentBlock < (numOfBlockStage + numOfPoseOnRoundStage - 1))
+                else if (currentBlock < (numOfBlockStage + numOfPoseOnRoundStage))
                 {
                     // update judge time (judge every 4 beats)
-                    startJudgeTime += waitTime;
-                    stopJudgeTime += waitTime;
+                    // startJudgeTime += waitTime;
+                    // stopJudgeTime += waitTime;
                     currentBlock++;
                     nextRoundTime += waitTime;
+                } else if (currentBlock == (numOfBlockStage + numOfPoseOnRoundStage))
+                {
+                    isOver = true;
                 }
-                feedbackText.text = "";
-                isPerfect = false;
-                isEarly = false;
-                isLate = false;
-                isPassCheckPoint = true;
-                Debug.Log("reset bool");
+                
                 // update the instruction image
-                SetTheInstruction();
-                model1.GetComponent<Animator>().SetBool(model1EndAnimationTriggerName, false);
-                model2.GetComponent<Animator>().SetBool(model2EndAnimationTriggerName, false);
-                SetPoseAnimation();
+                if (currentBlock < numOfBlockStage)
+                {
+                    SetTheInstruction();
+                    model1.GetComponent<Animator>().SetBool(model1EndAnimationTriggerName, false);
+                    model2.GetComponent<Animator>().SetBool(model2EndAnimationTriggerName, false);
+                    SetPoseAnimation();
+                } else
+                {
+                    instructionImage.sprite = null;
+                    if (currentBlock > numOfBlockStage)
+                    {
+                        freeSytleImage.SetActive(true);
+                    }
+                }
+                
             }
 
             // move the camera and model
@@ -308,8 +399,8 @@ public class GameMaster : MonoBehaviour {
                 model2.GetComponent<Animator>().SetTrigger("TurnRight");
             }
 
-            float p = 0;
-            // float p = PoseEstimator.instance.Estimate((currentBlock-1) % numOfPose);
+            //float p = 0;
+            float p = PoseEstimator.instance.Estimate((currentBlock-1) % numOfPose);
             // check gesture at start point
             if (!isEarly && currentTime <= (startJudgeTime + perfectPeriod) && currentTime >= (startJudgeTime - perfectPeriod))
             {
@@ -351,25 +442,21 @@ public class GameMaster : MonoBehaviour {
                 }
                 else if (!isPassCheckPoint)
                 {
-                    feedbackText.text = "Hold the gesture";
+                    feedbackText.text = "Hold the gesture"; // TODO: NOT IMPLEMENTED YET!!!
                 }
             }
 
-            // set the speed of animator
-         
+            // change animation
             if (model1.transform.position == nextCameraPosition && currentTime < startJudgeTime)
             {
-                // model1.GetComponent<Animator>().speed = 0f;
                 model1.GetComponent<Animator>().SetBool(model1StartAnimationTriggerName, true);
             }
             if (model2.transform.position == nextModel2Position && currentTime < startJudgeTime)
             {
-                // model2.GetComponent<Animator>().speed = 0f;
                 model2.GetComponent<Animator>().SetBool(model2StartAnimationTriggerName, true);
             }
            
             /*
-            // change animation
             if (currentTime < stopJudgeTime && currentTime >= startJudgeTime)
             {
                 model1.GetComponent<Animator>().SetBool(model1StartAnimationTriggerName, true);
@@ -388,7 +475,7 @@ public class GameMaster : MonoBehaviour {
                 model2.GetComponent<Animator>().SetBool(model2EndAnimationTriggerName, true);
             }
 
-            // check gesture within judge period
+            // TEST: check gesture within judge period
             /*
             if (currentTime <= stopJudgeTime && currentTime >= startJudgeTime)
             {
@@ -397,6 +484,15 @@ public class GameMaster : MonoBehaviour {
             {
                 model1.GetComponent<Renderer>().material.color = Color.white;
             }*/
+
+            // taking picture for player
+            if (currentTime > pictureTime && !freestyle)
+            {
+                freestyle = true;
+                PhotoSelection.instance.BeginCapture();
+                // TODO: Take picture here!!!
+                pictureTime += waitTime;
+            }
         }
     }
         
