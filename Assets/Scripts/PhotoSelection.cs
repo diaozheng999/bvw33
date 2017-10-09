@@ -111,7 +111,7 @@ public class PhotoSelection : Singleton<PhotoSelection> {
         previousPose = pose;
         if(movement > 30) return;   
 
-        var score = PoseEstimator.instance.Estimate(4);
+        var score = PoseEstimator.instance.Estimate(6);
 
         for(int i=0; i<numFrames; ++i){
             if(score <= frameScores[i]){

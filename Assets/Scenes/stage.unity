@@ -1015,7 +1015,7 @@ Prefab:
     - target: {fileID: 114854617085901128, guid: 6456685fbc766814096c27c6f2dae052,
         type: 2}
       propertyPath: poses.Array.size
-      value: 5
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4048629878419478, guid: 6456685fbc766814096c27c6f2dae052, type: 2}
       propertyPath: m_LocalPosition.x
@@ -1052,6 +1052,16 @@ Prefab:
     - target: {fileID: 114854617085901128, guid: 6456685fbc766814096c27c6f2dae052,
         type: 2}
       propertyPath: poses.Array.data[4]
+      value: egyptian_r
+      objectReference: {fileID: 0}
+    - target: {fileID: 114854617085901128, guid: 6456685fbc766814096c27c6f2dae052,
+        type: 2}
+      propertyPath: poses.Array.data[5]
+      value: egyptian_l
+      objectReference: {fileID: 0}
+    - target: {fileID: 114854617085901128, guid: 6456685fbc766814096c27c6f2dae052,
+        type: 2}
+      propertyPath: poses.Array.data[6]
       value: idle
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1853,6 +1863,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 28c3a97a54a65c348a1b30acb63e764c, type: 3}
   - {fileID: 21300000, guid: dcf7875232ad072418c68dff8a49c4a9, type: 3}
   - {fileID: 21300000, guid: bea1df709c60a974f988931518689250, type: 3}
+  - {fileID: 21300000, guid: 28edb332cdaa78e49b5e4beb0a23b133, type: 3}
+  - {fileID: 21300000, guid: 28edb332cdaa78e49b5e4beb0a23b133, type: 3}
+  - {fileID: 21300000, guid: 28edb332cdaa78e49b5e4beb0a23b133, type: 3}
+  - {fileID: 21300000, guid: 28edb332cdaa78e49b5e4beb0a23b133, type: 3}
   freeSytleImage: {fileID: 592836353}
   winImage: {fileID: 1743432166}
   loseImage: {fileID: 2060747083}
@@ -2108,7 +2122,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 985265417}
   m_LocalRotation: {x: 0.043619405, y: 0, z: 0, w: 0.9990483}
-  m_LocalPosition: {x: 0, y: 2, z: -4}
+  m_LocalPosition: {x: 0, y: 2.5, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1155107747}
@@ -5668,7 +5682,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1155107746}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.55, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 985265422}
@@ -6756,10 +6770,10 @@ RectTransform:
   m_Father: {fileID: 2141334646}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1743432168
 MonoBehaviour:
@@ -6780,7 +6794,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Texture: {fileID: 0}
+  m_Texture: {fileID: 2800000, guid: a9ce8fa51ca13ca4fa182820e85dea53, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
