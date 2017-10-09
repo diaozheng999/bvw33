@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4048629878419478}
   - component: {fileID: 114854617085901128}
+  - component: {fileID: 114190655770555696}
   m_Layer: 0
   m_Name: PoseEstimator
   m_TagString: Untagged
@@ -40,6 +41,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114190655770555696
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1674427975556442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49f8a5c9e661efa4da5c6877c73ebbf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numFrames: 10
+  beginCapture: 0
+  image: {fileID: 0}
+  image2: {fileID: 0}
+  frames: []
 --- !u!114 &114854617085901128
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -56,3 +73,6 @@ MonoBehaviour:
   - pose2
   - pose3
   - pose4
+  - egyptian_r
+  - egyptian_l
+  - idle

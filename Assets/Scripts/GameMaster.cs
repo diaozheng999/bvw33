@@ -23,6 +23,7 @@ public class GameMaster : MonoBehaviour {
     private float startJudgeTime;
     private float stopJudgeTime;
 
+    private float endTutorialTime = secondPerBeat * 16f;
     private float prepareTime = secondPerBeat * 24f;
     private float tutorialTime = secondPerBeat * 24f;
     private float countdownTime = secondPerBeat * 8f;
@@ -49,7 +50,7 @@ public class GameMaster : MonoBehaviour {
 
     private int numOfPose = 3;
     private int currentPose = -1;
-    private int[] poseSequence = new int[] { 1, 2, 3, /* <-tutorial*/0, 1, 2, 3, 1, 1, 2, 3, 2, 1, 1, 1, 1, 1, 1, 1 };
+    private int[] poseSequence = new int[] { 1, 2, 3, /* <-tutorial*/0, 1, 2, 3, 4, 1, 2, 3, 2, 1, 4, 5, 6, 2, 5, 6 };
 
     private float score = 0;
     float averageScore = 0f;
@@ -120,7 +121,9 @@ public class GameMaster : MonoBehaviour {
     private string model2StartAnimationTriggerName;
     private string model2EndAnimationTriggerName;
 
-    bool freestyle = false;
+    private bool isWalk = false;
+    private bool isFreeStyleImage = false;
+    private bool freestyle = false;
 
     bool beginScoreCapture = false;
 
@@ -148,11 +151,15 @@ public class GameMaster : MonoBehaviour {
 
     private IEnumerator DelayedStartTime()
     {
-        
-        // readyText.text = "Ready?";
-        yield return new WaitForSeconds(waitTime);
 
-        foreach(var countdown in countdownImages){
+        // readyText.text = "Ready?";
+        readyImgae.SetActive(true);
+        var readyanim = readyImgae.GetComponent<Animator>();
+        readyanim.SetTrigger("FadeIn");
+        yield return new WaitForSeconds(waitTime);
+        readyanim.SetTrigger("FadeOut");
+
+        foreach (var countdown in countdownImages){
             var anim = countdown.GetComponent<Animator>();
             countdown.SetActive(true);
             anim.SetTrigger("FadeIn");
@@ -172,6 +179,7 @@ public class GameMaster : MonoBehaviour {
         StarController.instance.Begin();
 
         yield return new WaitForSeconds(1);
+        readyImgae.SetActive(false);
         foreach(var countdown in countdownImages){
             countdown.SetActive(false);
         }
@@ -286,12 +294,25 @@ public class GameMaster : MonoBehaviour {
                 }
             }
 
+            if (currentTime >= endTutorialTime)
+            {
+                model1.GetComponent<Animator>().SetTrigger("EndTutorial");
+                model2.GetComponent<Animator>().SetTrigger("EndTutorial");
+            }
+
             // update model position && judge timing && calculate score
             if (currentTime >= nextRoundTime)
             {
-                // play the walking animation
-                model1.GetComponent<Animator>().SetTrigger("StartGame");
-                model2.GetComponent<Animator>().SetTrigger("StartGame");
+                if (!isWalk)
+                {
+                    isWalk = true;
+                    model1.transform.Rotate(0, 180, 0);
+                    model2.transform.Rotate(0, 180, 0);
+                    // play the walking animation
+                    model1.GetComponent<Animator>().SetTrigger("StartGame");
+                    model2.GetComponent<Animator>().SetTrigger("StartGame");
+                }
+                
 
                 var sc = 0f;
 
@@ -391,9 +412,12 @@ public class GameMaster : MonoBehaviour {
                 else
                 {
                     instructionImage.sprite = instructions[6];
-                    if (currentBlock > numOfBlockStage)
+                    if (currentBlock > numOfBlockStage && !isFreeStyleImage)
                     {
+                        isFreeStyleImage = true;
                         freeSytleImage.SetActive(true);
+                        var freeanim = freeSytleImage.GetComponent<Animator>();
+                        freeanim.SetTrigger("FadeIn");
                     }
                 }
 
