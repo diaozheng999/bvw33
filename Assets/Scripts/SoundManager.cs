@@ -10,17 +10,17 @@ public class SoundManager : Singleton<SoundManager> {
 	[SerializeField] AudioClip applause;
 	[SerializeField] AudioClip boo;
 
-	AudioSource asrc;
+	[SerializeField] AudioClip monkey;
 
-	// Use this for initialization
-	void Start () {
-		asrc = GetComponent<AudioSource>();
-	}
+	[SerializeField] AudioSource asrc;
+	[SerializeField] AudioSource asrcSec;
+
+
 
 	IEnumerator PlayFlashesCr() {
 		var n_flashes = 5;
 		for(int i=0; i<n_flashes; ++i){
-			asrc.PlayOneShot(flashes[Random.Range(0, flashes.Length)]);
+			asrcSec.PlayOneShot(flashes[Random.Range(0, flashes.Length)]);
 			yield return new WaitForSeconds(Random.value/2);
 		}
 	}
@@ -50,6 +50,10 @@ public class SoundManager : Singleton<SoundManager> {
 	public void PlayGoodSoundscape(){
 		PlayFlashOnce();
 		PlayApplause();
+	}
+
+	public void PlayMonkeySound(){
+		asrc.PlayOneShot(monkey);
 	}
 
 	/* 
