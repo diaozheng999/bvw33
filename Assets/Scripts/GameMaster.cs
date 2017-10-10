@@ -224,7 +224,8 @@ public class GameMaster : MonoBehaviour {
 
     private void SetTheScene(int numOfStage)
     {
-        stageGenerator.GetComponent<StageGenerator>().GenerateStageAt(currentStagePosition);
+        // stageGenerator.GetComponent<StageGenerator>().GenerateStageAt(currentStagePosition);
+    
         for (int i = 1; i < numOfStage; i++)
         {
             currentStagePosition += stageOffSet;
