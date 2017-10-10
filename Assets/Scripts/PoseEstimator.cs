@@ -50,7 +50,7 @@ public class PoseEstimator : Singleton<PoseEstimator> {
 	};
 
 	public float Estimate(int poseId){
-        return 0f;
+        //return 0f;
 		if(!isComplete && !loaders[poseId].IsComplete) return 0f;
 
 		var _body = PoseProvider.instance.GetCurrentTrackedBody();
