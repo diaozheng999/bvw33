@@ -23,6 +23,9 @@ public class PhotoSelection : Singleton<PhotoSelection> {
 
     [SerializeField] Texture2D[] frames;
 
+    [SerializeField] GameObject[] fireworks;
+    [SerializeField] Vector3[] fireworkPositions;
+
     float[] frameScores;
     bool[] pictureTaken;
 
@@ -63,6 +66,23 @@ public class PhotoSelection : Singleton<PhotoSelection> {
         buffer = new byte[desc.LengthInPixels * desc.BytesPerPixel];
     }
 
+    
+
+
+    IEnumerator Firework(){
+        var n_fw = Random.Range(2, fireworkPositions.Length);
+        HashSet<int> seen = new HashSet<int>();
+        for(int i=0; i<n_fw; ++i){
+            int setPos;
+            do{
+                setPos = Random.Range(0, fireworkPositions.Length);
+            }while(seen.Contains(setPos));
+            seen.Add(setPos);
+
+            Instantiate(fireworks[Random.Range(0, fireworks.Length)], fireworkPositions[setPos], Quaternion.Euler(-90, 0, 0));
+            yield return new WaitForSeconds(0.1f * Random.value);
+        }
+    }
 
 
     bool JointFilter(int i) {
@@ -126,6 +146,7 @@ public class PhotoSelection : Singleton<PhotoSelection> {
                 SetFrame(i);
                 frameScores[i] = score;
                 SoundManager.instance.PlayFlashOnce();
+                StartCoroutine(Firework());
                 StartCoroutine(Timeout());
                 break;
             }

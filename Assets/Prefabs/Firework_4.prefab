@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 199262714008441276}
   - component: {fileID: 114363725743574900}
   m_Layer: 0
-  m_Name: RedFirework
+  m_Name: Firework_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3330,7 +3330,7 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1c177063a97588242b063c3b3558aad5, type: 2}
+  - {fileID: 2100000, guid: cc4bf53596019e146aa377326a4e0d1b, type: 2}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
