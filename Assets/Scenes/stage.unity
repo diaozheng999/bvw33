@@ -2113,9 +2113,9 @@ MonoBehaviour:
   hereWeGoImgae: {fileID: 1959178973}
   startButton: {fileID: 222503960}
   instructions:
-  - {fileID: 21300000, guid: 66c02e79fc4a579408ed3e8928d0122e, type: 3}
-  - {fileID: 21300000, guid: 9d1a7704046864140aff2e024bc83fed, type: 3}
   - {fileID: 21300000, guid: 389b99872bbf75047af56721912308fc, type: 3}
+  - {fileID: 21300000, guid: 9d1a7704046864140aff2e024bc83fed, type: 3}
+  - {fileID: 21300000, guid: 66c02e79fc4a579408ed3e8928d0122e, type: 3}
   - {fileID: 21300000, guid: e2cbf8f968f935b42a5a42697032bd70, type: 3}
   - {fileID: 21300000, guid: 4505ccb4b6dc3634eadc9795451be02f, type: 3}
   - {fileID: 21300000, guid: 030d8fda983d3d54a932612639109ac4, type: 3}
